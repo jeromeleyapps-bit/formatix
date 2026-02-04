@@ -1,0 +1,209 @@
+@model FormationManager.Models.Session
+@{
+    ViewData["Title"] = "Détails session";
+}
+
+@if (TempData["ConflitsWarning"] != null)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-triangle me-1"></i> @TempData["ConflitsWarning"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="card-title">@Model.Formation?.Titre</h5>
+        @if (ViewBag.ShowSite == true)
+        {
+            var siteNames = ViewBag.SiteNames as Dictionary<string, string>;
+            var siteLabel = siteNames != null && siteNames.ContainsKey(Model.SiteId)
+                ? siteNames[Model.SiteId]
+                : Model.SiteId;
+            <p class="mb-1"><strong>Site :</strong> @siteLabel</p>
+        }
+        <p class="mb-1"><strong>Dates :</strong> @Model.DateDebut.ToString("dd/MM/yyyy") - @Model.DateFin.ToString("dd/MM/yyyy")</p>
+        <p class="mb-1"><strong>Lieu :</strong> @(Model.Salle != null ? Model.Salle.Nom + (string.IsNullOrWhiteSpace(Model.Lieu) ? "" : " – " + Model.Lieu) : (Model.Lieu ?? "–"))</p>
+        <p class="mb-1"><strong>Formateur :</strong> @Model.Formateur?.Nom @Model.Formateur?.Prenom</p>
+        <p class="mb-1"><strong>Statut :</strong> @Model.Statut</p>
+        <p class="mb-3"><strong>Max stagiaires :</strong> @Model.NombreMaxStagiaires</p>
+
+        <div class="mb-4">
+            <h6 class="fw-bold">Checklist session (formateur)</h6>
+            <ul class="list-unstyled small mb-0">
+                <li class="mb-1">
+                    <i class="fas fa-share-square text-primary me-1"></i>
+                    Partager le lien / QR d'inscription aux stagiaires
+                </li>
+                <li class="mb-1">
+                    <i class="fas fa-users text-primary me-1"></i>
+                    Vérifier les stagiaires inscrits et les informations saisies
+                </li>
+                <li class="mb-1">
+                    <i class="fas fa-file-signature text-primary me-1"></i>
+                    Générer et faire signer les feuilles d'émargement pour chaque jour
+                </li>
+                <li class="mb-1">
+                    <i class="fas fa-clipboard-check text-primary me-1"></i>
+                    Saisir ou téléverser les évaluations stagiaires (si prévues)
+                </li>
+                <li>
+                    <i class="fas fa-flag-checkered text-primary me-1"></i>
+                    Clôturer la session et vérifier les documents Qualiopi associés
+                </li>
+            </ul>
+        </div>
+
+        <div class="mb-4">
+            <h6>Documents</h6>
+            <div class="d-flex flex-wrap gap-2">
+                <a asp-action="GenerateEmargement" asp-route-id="@Model.Id" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-file-pdf"></i> Émargement
+                </a>
+            </div>
+        </div>
+
+        @if (Model.SessionClients?.Any() == true)
+        {
+            <div class="mb-4">
+                <h6>Conventions clients</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Client</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var sc in Model.SessionClients)
+                            {
+                                <tr>
+                                    <td>@sc.Client?.Nom</td>
+                                    <td>
+                                        <a asp-action="GenerateConvention" asp-route-id="@Model.Id" asp-route-clientId="@sc.ClientId"
+                                           class="btn btn-outline-secondary btn-sm">
+                                            <i class="fas fa-file-pdf"></i> Convention
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+
+        @{
+            var inscriptionUrl = ViewBag.InscriptionUrl as string;
+        }
+        @if (!string.IsNullOrEmpty(inscriptionUrl))
+        {
+            <div class="mb-4">
+                <h6 class="fw-bold">Inscription en ligne</h6>
+                <div class="d-flex flex-wrap align-items-start gap-3">
+                    <div class="flex-grow-1" style="min-width: 200px;">
+                        <label class="form-label small text-muted mb-1">Lien à partager</label>
+                        <div class="input-group input-group-sm">
+                            <input type="text" class="form-control font-monospace" id="inscriptionLien" readonly value="@inscriptionUrl" />
+                            <button type="button" class="btn btn-outline-secondary" id="btnCopierLien" title="Copier">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="form-label small text-muted mb-1 d-block">QR code</label>
+                        <img src="@Url.Action("QR", "Inscription", new { id = Model.Id })" alt="QR inscription" width="120" height="120" class="border rounded" />
+                        <div class="mt-1">
+                            <a href="@Url.Action("QR", "Inscription", new { id = Model.Id })" download="@("inscription-session-" + Model.Id + ".png")" class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-download"></i> Télécharger
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (Model.Stagiaires?.Any() == true)
+        {
+            <div class="mb-4">
+                <h6>Stagiaires</h6>
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Client</th>
+                                <th>Documents</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var stagiaire in Model.Stagiaires)
+                            {
+                                <tr>
+                                    <td>@stagiaire.Nom @stagiaire.Prenom</td>
+                                    <td>@stagiaire.Client?.Nom</td>
+                                    <td class="d-flex flex-wrap gap-2 align-items-center">
+                                        <a asp-controller="Stagiaires" asp-action="GenerateAttestation" asp-route-id="@stagiaire.Id"
+                                           class="btn btn-outline-secondary btn-sm">
+                                            <i class="fas fa-file-pdf"></i> Attestation
+                                        </a>
+                                        <a asp-controller="Stagiaires" asp-action="GenerateEvaluation" asp-route-id="@stagiaire.Id"
+                                           class="btn btn-outline-secondary btn-sm">
+                                            <i class="fas fa-file-pdf"></i> Évaluation
+                                        </a>
+                                        <a asp-controller="Stagiaires" asp-action="Delete" asp-route-id="@stagiaire.Id"
+                                           asp-route-returnUrl="@Url.Action("Details", "Sessions", new { id = Model.Id })"
+                                           class="btn btn-outline-danger btn-sm" title="Supprimer l'inscription">
+                                            <i class="fas fa-trash-alt"></i> Supprimer
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+
+        <div class="d-flex flex-wrap gap-2 align-items-center">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">Modifier</a>
+            @if (Model.Statut != "Terminée" && Model.Statut != "Annulée")
+            {
+                <form asp-action="Cloturer" asp-route-id="@Model.Id" method="post" class="d-inline" onsubmit="return confirm('Clôturer cette session ? Les inscriptions ne seront plus possibles.');">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-success">
+                        <i class="fas fa-flag-checkered me-1"></i> Clôturer la session
+                    </button>
+                </form>
+            }
+            <a asp-action="Index" class="btn btn-outline-secondary">Retour</a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+(function () {
+    var btn = document.getElementById('btnCopierLien');
+    var input = document.getElementById('inscriptionLien');
+    if (!btn || !input) return;
+    btn.addEventListener('click', function () {
+        input.select();
+        input.setSelectionRange(0, 99999);
+        function done() {
+            var icon = btn.querySelector('i');
+            icon.className = 'fas fa-check text-success';
+            setTimeout(function () { icon.className = 'fas fa-copy'; }, 2000);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(input.value).then(done).catch(function () {
+                try { document.execCommand('copy'); done(); } catch (e) {}
+            });
+        } else {
+            try { document.execCommand('copy'); done(); } catch (e) {}
+        }
+    });
+})();
+</script>
+}

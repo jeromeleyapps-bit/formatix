@@ -1,0 +1,394 @@
+[2026-02-02 22:41:56.100 +01:00 INF] Démarrage de l'application FormatiX {"EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":2}
+[2026-02-02 22:41:57.715 +01:00 INF] Base de données migrée avec succès {"SourceContext":"Program","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":2}
+[2026-02-02 22:41:58.177 +01:00 INF] Base de données initialisée avec succès {"SourceContext":"Program","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":2}
+[2026-02-02 22:41:58.179 +01:00 INF] Application FormatiX démarrée avec succès {"EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":2}
+[2026-02-02 22:42:02.397 +01:00 DBG] Ollama n'est pas disponible {"SourceContext":"FormationManager.Infrastructure.AI.OllamaAIService","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+System.Net.Http.HttpRequestException: Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée. (localhost:11434)
+ ---> System.Net.Sockets.SocketException (10061): Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée.
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)
+   at System.Net.Sockets.Socket.<ConnectAsync>g__WaitForConnectWithCancellation|285_0(AwaitableSocketAsyncEventArgs saea, ValueTask connectTask, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.CreateHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.InjectNewHttp11ConnectionAsync(QueueItem queueItem)
+   at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at Microsoft.Extensions.Http.Logging.LoggingHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+   at Microsoft.Extensions.Http.Logging.LoggingScopeHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+   at FormationManager.Infrastructure.AI.OllamaAIService.IsServiceAvailableAsync() in C:\AI\Opagax\Infrastructure\AI\OllamaAIService.cs:line 136
+[2026-02-02 22:42:02.476 +01:00 WRN] Ollama n'est pas disponible. Tentative de démarrage automatique: ollama serve {"SourceContext":"FormationManager.Infrastructure.AI.OllamaAutoStartHostedService","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+[2026-02-02 22:42:02.510 +01:00 WRN] AutoStart Ollama a échoué: An error occurred trying to start process 'ollama' with working directory 'C:\AI\Opagax'. Le fichier spécifié est introuvable. {"SourceContext":"FormationManager.Infrastructure.AI.OllamaAutoStartHostedService","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+System.ComponentModel.Win32Exception (2): An error occurred trying to start process 'ollama' with working directory 'C:\AI\Opagax'. Le fichier spécifié est introuvable.
+   at System.Diagnostics.Process.StartWithCreateProcess(ProcessStartInfo startInfo)
+   at System.Diagnostics.Process.Start(ProcessStartInfo startInfo)
+   at FormationManager.Infrastructure.AI.OllamaAutoStartHostedService.StartAsync(CancellationToken cancellationToken) in C:\AI\Opagax\Infrastructure\AI\OllamaAutoStartHostedService.cs:line 68
+[2026-02-02 22:42:02.609 +01:00 INF] Now listening on: http://localhost:5000 {"EventId":{"Id":14,"Name":"ListeningOnAddress"},"SourceContext":"Microsoft.Hosting.Lifetime","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+[2026-02-02 22:42:02.610 +01:00 INF] Application started. Press Ctrl+C to shut down. {"SourceContext":"Microsoft.Hosting.Lifetime","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+[2026-02-02 22:42:02.610 +01:00 INF] Hosting environment: Production {"SourceContext":"Microsoft.Hosting.Lifetime","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+[2026-02-02 22:42:02.610 +01:00 INF] Content root path: C:\AI\Opagax {"SourceContext":"Microsoft.Hosting.Lifetime","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+[2026-02-02 22:42:02.839 +01:00 WRN] Failed to determine the https port for redirect. {"EventId":{"Id":3,"Name":"FailedToDeterminePort"},"SourceContext":"Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware","RequestId":"0HNJ2KFJG380O:00000001","RequestPath":"/","ConnectionId":"0HNJ2KFJG380O","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+[2026-02-02 22:42:02.898 +01:00 INF] HTTP GET / responded 302 in 61.2789 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJ2KFJG380O:00000001","ConnectionId":"0HNJ2KFJG380O","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+[2026-02-02 22:42:03.063 +01:00 INF] HTTP GET /Account/Login responded 200 in 146.3594 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJ2KFJG380O:00000002","ConnectionId":"0HNJ2KFJG380O","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":12}
+[2026-02-02 22:53:59.157 +01:00 INF] Démarrage de l'application FormatiX {"EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":2}
+[2026-02-02 22:54:00.734 +01:00 INF] Base de données migrée avec succès {"SourceContext":"Program","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":2}
+[2026-02-02 22:54:01.083 +01:00 INF] Base de données initialisée avec succès {"SourceContext":"Program","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":2}
+[2026-02-02 22:54:01.084 +01:00 INF] Application FormatiX démarrée avec succès {"EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":2}
+[2026-02-02 22:54:05.235 +01:00 DBG] Ollama n'est pas disponible {"SourceContext":"FormationManager.Infrastructure.AI.OllamaAIService","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+System.Net.Http.HttpRequestException: Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée. (localhost:11434)
+ ---> System.Net.Sockets.SocketException (10061): Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée.
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)
+   at System.Net.Sockets.Socket.<ConnectAsync>g__WaitForConnectWithCancellation|285_0(AwaitableSocketAsyncEventArgs saea, ValueTask connectTask, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.CreateHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.InjectNewHttp11ConnectionAsync(QueueItem queueItem)
+   at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at Microsoft.Extensions.Http.Logging.LoggingHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+   at Microsoft.Extensions.Http.Logging.LoggingScopeHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+   at FormationManager.Infrastructure.AI.OllamaAIService.IsServiceAvailableAsync() in C:\AI\Opagax\Infrastructure\AI\OllamaAIService.cs:line 136
+[2026-02-02 22:54:05.259 +01:00 WRN] Ollama n'est pas disponible. Tentative de démarrage automatique: ollama serve {"SourceContext":"FormationManager.Infrastructure.AI.OllamaAutoStartHostedService","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+[2026-02-02 22:54:05.263 +01:00 WRN] AutoStart Ollama a échoué: An error occurred trying to start process 'ollama' with working directory 'C:\AI\Opagax'. Le fichier spécifié est introuvable. {"SourceContext":"FormationManager.Infrastructure.AI.OllamaAutoStartHostedService","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+System.ComponentModel.Win32Exception (2): An error occurred trying to start process 'ollama' with working directory 'C:\AI\Opagax'. Le fichier spécifié est introuvable.
+   at System.Diagnostics.Process.StartWithCreateProcess(ProcessStartInfo startInfo)
+   at System.Diagnostics.Process.Start(ProcessStartInfo startInfo)
+   at FormationManager.Infrastructure.AI.OllamaAutoStartHostedService.StartAsync(CancellationToken cancellationToken) in C:\AI\Opagax\Infrastructure\AI\OllamaAutoStartHostedService.cs:line 68
+[2026-02-02 22:54:05.293 +01:00 INF] Now listening on: http://localhost:5000 {"EventId":{"Id":14,"Name":"ListeningOnAddress"},"SourceContext":"Microsoft.Hosting.Lifetime","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+[2026-02-02 22:54:05.294 +01:00 INF] Application started. Press Ctrl+C to shut down. {"SourceContext":"Microsoft.Hosting.Lifetime","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+[2026-02-02 22:54:05.294 +01:00 INF] Hosting environment: Production {"SourceContext":"Microsoft.Hosting.Lifetime","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+[2026-02-02 22:54:05.294 +01:00 INF] Content root path: C:\AI\Opagax {"SourceContext":"Microsoft.Hosting.Lifetime","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+[2026-02-02 22:54:05.586 +01:00 WRN] Failed to determine the https port for redirect. {"EventId":{"Id":3,"Name":"FailedToDeterminePort"},"SourceContext":"Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware","RequestId":"0HNJ2KMASQ2AU:00000001","RequestPath":"/","ConnectionId":"0HNJ2KMASQ2AU","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+[2026-02-02 22:54:05.631 +01:00 INF] HTTP GET / responded 302 in 47.2212 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJ2KMASQ2AU:00000001","ConnectionId":"0HNJ2KMASQ2AU","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+[2026-02-02 22:54:05.750 +01:00 INF] HTTP GET /Account/Login responded 200 in 106.1591 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJ2KMASQ2AU:00000002","ConnectionId":"0HNJ2KMASQ2AU","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":12}
+[2026-02-02 22:54:05.973 +01:00 INF] HTTP GET /favicon.ico responded 200 in 30.3161 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJ2KMASQ2AU:00000003","ConnectionId":"0HNJ2KMASQ2AU","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":12}
+[2026-02-02 22:54:06.009 +01:00 INF] HTTP GET / responded 302 in 5.7338 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJ2KMASQ2B0:00000001","ConnectionId":"0HNJ2KMASQ2B0","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+[2026-02-02 22:54:06.045 +01:00 INF] HTTP GET /Account/Login responded 200 in 32.9921 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJ2KMASQ2B0:00000002","ConnectionId":"0HNJ2KMASQ2B0","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+[2026-02-02 22:54:22.865 +01:00 INF] Tentative de connexion pour lauriecentelles.pro@gmail.com {"SourceContext":"FormationManager.Controllers.AccountController","ActionId":"04f654e2-c7dd-4dd9-bc4e-e91ed919aafe","ActionName":"FormationManager.Controllers.AccountController.Login (FormationManager)","RequestId":"0HNJ2KMASQ2AU:00000004","RequestPath":"/Account/Login","ConnectionId":"0HNJ2KMASQ2AU","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+[2026-02-02 22:54:23.039 +01:00 INF] Connexion réussie pour lauriecentelles.pro@gmail.com {"SourceContext":"FormationManager.Controllers.AccountController","ActionId":"04f654e2-c7dd-4dd9-bc4e-e91ed919aafe","ActionName":"FormationManager.Controllers.AccountController.Login (FormationManager)","RequestId":"0HNJ2KMASQ2AU:00000004","RequestPath":"/Account/Login","ConnectionId":"0HNJ2KMASQ2AU","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+[2026-02-02 22:54:23.115 +01:00 INF] HTTP POST /Account/Login responded 302 in 279.0083 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJ2KMASQ2AU:00000004","ConnectionId":"0HNJ2KMASQ2AU","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+[2026-02-02 22:54:23.529 +01:00 INF] HTTP GET / responded 200 in 409.7427 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJ2KMASQ2AU:00000005","ConnectionId":"0HNJ2KMASQ2AU","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":8}
+[2026-02-02 22:54:23.567 +01:00 INF] HTTP GET /css/opagax-custom.css responded 200 in 3.6603 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJ2KMASQ2AU:00000006","ConnectionId":"0HNJ2KMASQ2AU","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":12}
+[2026-02-02 22:54:23.568 +01:00 INF] HTTP GET /js/opagax.js responded 200 in 3.3393 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJ2KMASQ2AV:00000001","ConnectionId":"0HNJ2KMASQ2AV","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":8}
+[2026-02-02 22:54:32.971 +01:00 INF] HTTP GET /Formations responded 200 in 117.2336 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJ2KMASQ2AV:00000002","ConnectionId":"0HNJ2KMASQ2AV","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":12}
+[2026-02-02 22:54:32.996 +01:00 INF] HTTP GET /css/opagax-custom.css responded 304 in 0.9484 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJ2KMASQ2AV:00000003","ConnectionId":"0HNJ2KMASQ2AV","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":12}
+[2026-02-02 22:54:32.998 +01:00 INF] HTTP GET /js/opagax.js responded 304 in 0.3076 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJ2KMASQ2AU:00000007","ConnectionId":"0HNJ2KMASQ2AU","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":12}
+[2026-02-02 22:54:36.397 +01:00 WRN] The query uses a row limiting operator ('Skip'/'Take') without an 'OrderBy' operator. This may lead to unpredictable results. If the 'Distinct' operator is used after 'OrderBy', then make sure to use the 'OrderBy' operator after 'Distinct' as the ordering would otherwise get erased. {"EventId":{"Id":10102,"Name":"Microsoft.EntityFrameworkCore.Query.RowLimitingOperationWithoutOrderByWarning"},"SourceContext":"Microsoft.EntityFrameworkCore.Query","ActionId":"ae86f638-5bec-4c4d-a524-6dfcb94f25b6","ActionName":"FormationManager.Controllers.FormationsController.ExportCataloguePDF (FormationManager)","RequestId":"0HNJ2KMASQ2AU:00000008","RequestPath":"/Formations/ExportCataloguePDF","ConnectionId":"0HNJ2KMASQ2AU","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":8}
+[2026-02-02 22:54:37.091 +01:00 INF] HTTP GET /Formations/ExportCataloguePDF responded 200 in 711.9340 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJ2KMASQ2AU:00000008","ConnectionId":"0HNJ2KMASQ2AU","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":8}
+[2026-02-02 22:59:09.024 +01:00 INF] Démarrage de l'application FormatiX {"EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":2}
+[2026-02-02 22:59:10.455 +01:00 INF] Base de données migrée avec succès {"SourceContext":"Program","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":2}
+[2026-02-02 22:59:10.826 +01:00 INF] Base de données initialisée avec succès {"SourceContext":"Program","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":2}
+[2026-02-02 22:59:10.827 +01:00 INF] Application FormatiX démarrée avec succès {"EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":2}
+[2026-02-02 22:59:14.991 +01:00 DBG] Ollama n'est pas disponible {"SourceContext":"FormationManager.Infrastructure.AI.OllamaAIService","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+System.Net.Http.HttpRequestException: Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée. (localhost:11434)
+ ---> System.Net.Sockets.SocketException (10061): Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée.
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)
+   at System.Net.Sockets.Socket.<ConnectAsync>g__WaitForConnectWithCancellation|285_0(AwaitableSocketAsyncEventArgs saea, ValueTask connectTask, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.CreateHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.InjectNewHttp11ConnectionAsync(QueueItem queueItem)
+   at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at Microsoft.Extensions.Http.Logging.LoggingHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+   at Microsoft.Extensions.Http.Logging.LoggingScopeHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+   at FormationManager.Infrastructure.AI.OllamaAIService.IsServiceAvailableAsync() in C:\AI\Opagax\Infrastructure\AI\OllamaAIService.cs:line 136
+[2026-02-02 22:59:15.023 +01:00 WRN] Ollama n'est pas disponible. Tentative de démarrage automatique: ollama serve {"SourceContext":"FormationManager.Infrastructure.AI.OllamaAutoStartHostedService","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+[2026-02-02 22:59:15.026 +01:00 WRN] AutoStart Ollama a échoué: An error occurred trying to start process 'ollama' with working directory 'C:\AI\Opagax'. Le fichier spécifié est introuvable. {"SourceContext":"FormationManager.Infrastructure.AI.OllamaAutoStartHostedService","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+System.ComponentModel.Win32Exception (2): An error occurred trying to start process 'ollama' with working directory 'C:\AI\Opagax'. Le fichier spécifié est introuvable.
+   at System.Diagnostics.Process.StartWithCreateProcess(ProcessStartInfo startInfo)
+   at System.Diagnostics.Process.Start(ProcessStartInfo startInfo)
+   at FormationManager.Infrastructure.AI.OllamaAutoStartHostedService.StartAsync(CancellationToken cancellationToken) in C:\AI\Opagax\Infrastructure\AI\OllamaAutoStartHostedService.cs:line 68
+[2026-02-02 22:59:15.064 +01:00 INF] Now listening on: http://localhost:5000 {"EventId":{"Id":14,"Name":"ListeningOnAddress"},"SourceContext":"Microsoft.Hosting.Lifetime","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+[2026-02-02 22:59:15.064 +01:00 INF] Application started. Press Ctrl+C to shut down. {"SourceContext":"Microsoft.Hosting.Lifetime","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+[2026-02-02 22:59:15.064 +01:00 INF] Hosting environment: Production {"SourceContext":"Microsoft.Hosting.Lifetime","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+[2026-02-02 22:59:15.064 +01:00 INF] Content root path: C:\AI\Opagax {"SourceContext":"Microsoft.Hosting.Lifetime","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+[2026-02-02 22:59:15.469 +01:00 WRN] Failed to determine the https port for redirect. {"EventId":{"Id":3,"Name":"FailedToDeterminePort"},"SourceContext":"Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware","RequestId":"0HNJ2KP787SJ2:00000001","RequestPath":"/","ConnectionId":"0HNJ2KP787SJ2","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+[2026-02-02 22:59:15.507 +01:00 INF] HTTP GET / responded 302 in 38.3999 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJ2KP787SJ2:00000001","ConnectionId":"0HNJ2KP787SJ2","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+[2026-02-02 22:59:15.601 +01:00 INF] HTTP GET /Account/Login responded 200 in 85.5963 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJ2KP787SJ2:00000002","ConnectionId":"0HNJ2KP787SJ2","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":12}
+[2026-02-02 23:00:08.687 +01:00 INF] Export catalogue : 1 formation(s) trouvée(s) {"SourceContext":"FormationManager.Services.ExportService","ActionId":"e73fe041-6a84-4f3e-b971-7028cec4f2c0","ActionName":"FormationManager.Controllers.FormationsController.ExportCataloguePDF (FormationManager)","RequestId":"0HNJ2KP787SJ3:00000001","RequestPath":"/Formations/ExportCataloguePDF","ConnectionId":"0HNJ2KP787SJ3","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":16}
+[2026-02-02 23:00:08.716 +01:00 WRN] The query uses a row limiting operator ('Skip'/'Take') without an 'OrderBy' operator. This may lead to unpredictable results. If the 'Distinct' operator is used after 'OrderBy', then make sure to use the 'OrderBy' operator after 'Distinct' as the ordering would otherwise get erased. {"EventId":{"Id":10102,"Name":"Microsoft.EntityFrameworkCore.Query.RowLimitingOperationWithoutOrderByWarning"},"SourceContext":"Microsoft.EntityFrameworkCore.Query","ActionId":"e73fe041-6a84-4f3e-b971-7028cec4f2c0","ActionName":"FormationManager.Controllers.FormationsController.ExportCataloguePDF (FormationManager)","RequestId":"0HNJ2KP787SJ3:00000001","RequestPath":"/Formations/ExportCataloguePDF","ConnectionId":"0HNJ2KP787SJ3","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":16}
+[2026-02-02 23:00:09.486 +01:00 INF] HTTP GET /Formations/ExportCataloguePDF responded 200 in 1653.8388 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJ2KP787SJ3:00000001","ConnectionId":"0HNJ2KP787SJ3","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":16}
+[2026-02-02 23:01:12.954 +01:00 INF] HTTP GET / responded 200 in 362.8371 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJ2KP787SJ3:00000002","ConnectionId":"0HNJ2KP787SJ3","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":17}
+[2026-02-02 23:01:12.988 +01:00 INF] HTTP GET /css/opagax-custom.css responded 304 in 2.6935 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJ2KP787SJ3:00000003","ConnectionId":"0HNJ2KP787SJ3","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":3}
+[2026-02-02 23:01:12.991 +01:00 INF] HTTP GET /js/opagax.js responded 304 in 0.8997 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJ2KP787SJ5:00000001","ConnectionId":"0HNJ2KP787SJ5","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":17}
+[2026-02-02 23:01:20.250 +01:00 INF] HTTP GET /QualiopiUi responded 200 in 54.3316 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJ2KP787SJ5:00000002","ConnectionId":"0HNJ2KP787SJ5","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":17}
+[2026-02-02 23:01:27.365 +01:00 INF] HTTP GET /Bpf responded 200 in 14.6560 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJ2KP787SJ5:00000003","ConnectionId":"0HNJ2KP787SJ5","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":17}
+[2026-02-02 23:01:31.080 +01:00 INF] HTTP GET /Bpf/Download responded 200 in 211.0816 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJ2KP787SJ5:00000004","ConnectionId":"0HNJ2KP787SJ5","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":17}
+[2026-02-02 23:13:03.044 +01:00 INF] Démarrage de l'application FormatiX {"EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":2}
+[2026-02-02 23:13:04.476 +01:00 INF] Base de données migrée avec succès {"SourceContext":"Program","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":2}
+[2026-02-02 23:13:04.838 +01:00 INF] Base de données initialisée avec succès {"SourceContext":"Program","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":2}
+[2026-02-02 23:13:04.840 +01:00 INF] Application FormatiX démarrée avec succès {"EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":2}
+[2026-02-02 23:13:08.983 +01:00 DBG] Ollama n'est pas disponible {"SourceContext":"FormationManager.Infrastructure.AI.OllamaAIService","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+System.Net.Http.HttpRequestException: Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée. (localhost:11434)
+ ---> System.Net.Sockets.SocketException (10061): Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée.
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)
+   at System.Net.Sockets.Socket.<ConnectAsync>g__WaitForConnectWithCancellation|285_0(AwaitableSocketAsyncEventArgs saea, ValueTask connectTask, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.CreateHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.InjectNewHttp11ConnectionAsync(QueueItem queueItem)
+   at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at Microsoft.Extensions.Http.Logging.LoggingHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+   at Microsoft.Extensions.Http.Logging.LoggingScopeHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+   at FormationManager.Infrastructure.AI.OllamaAIService.IsServiceAvailableAsync() in C:\AI\Opagax\Infrastructure\AI\OllamaAIService.cs:line 136
+[2026-02-02 23:13:09.011 +01:00 WRN] Ollama n'est pas disponible. Tentative de démarrage automatique: ollama serve {"SourceContext":"FormationManager.Infrastructure.AI.OllamaAutoStartHostedService","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+[2026-02-02 23:13:09.014 +01:00 WRN] AutoStart Ollama a échoué: An error occurred trying to start process 'ollama' with working directory 'C:\AI\Opagax'. Le fichier spécifié est introuvable. {"SourceContext":"FormationManager.Infrastructure.AI.OllamaAutoStartHostedService","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+System.ComponentModel.Win32Exception (2): An error occurred trying to start process 'ollama' with working directory 'C:\AI\Opagax'. Le fichier spécifié est introuvable.
+   at System.Diagnostics.Process.StartWithCreateProcess(ProcessStartInfo startInfo)
+   at System.Diagnostics.Process.Start(ProcessStartInfo startInfo)
+   at FormationManager.Infrastructure.AI.OllamaAutoStartHostedService.StartAsync(CancellationToken cancellationToken) in C:\AI\Opagax\Infrastructure\AI\OllamaAutoStartHostedService.cs:line 68
+[2026-02-02 23:13:09.038 +01:00 INF] Now listening on: http://localhost:5000 {"EventId":{"Id":14,"Name":"ListeningOnAddress"},"SourceContext":"Microsoft.Hosting.Lifetime","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+[2026-02-02 23:13:09.038 +01:00 INF] Application started. Press Ctrl+C to shut down. {"SourceContext":"Microsoft.Hosting.Lifetime","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+[2026-02-02 23:13:09.039 +01:00 INF] Hosting environment: Production {"SourceContext":"Microsoft.Hosting.Lifetime","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+[2026-02-02 23:13:09.039 +01:00 INF] Content root path: C:\AI\Opagax {"SourceContext":"Microsoft.Hosting.Lifetime","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+[2026-02-02 23:13:11.279 +01:00 WRN] Failed to determine the https port for redirect. {"EventId":{"Id":3,"Name":"FailedToDeterminePort"},"SourceContext":"Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware","RequestId":"0HNJ2L10B3KSK:00000001","RequestPath":"/Bpf/Download","ConnectionId":"0HNJ2L10B3KSK","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+[2026-02-02 23:13:11.606 +01:00 ERR] HTTP GET /Bpf/Download responded 500 in 327.5533 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJ2L10B3KSK:00000001","ConnectionId":"0HNJ2L10B3KSK","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+QuestPDF.Drawing.Exceptions.DocumentComposeException: The 'Page.Footer' layer has already been defined. Please call this method only once.
+   at QuestPDF.Fluent.PageDescriptor.Footer()
+   at FormationManager.Services.BPFService.<>c__DisplayClass7_0.<GenerateBPFAsync>b__4(PageDescriptor page) in C:\AI\Opagax\Services\BPFService.cs:line 460
+   at QuestPDF.Fluent.PageExtensions.Page(IDocumentContainer document, Action`1 handler)
+   at FormationManager.Services.BPFService.<>c__DisplayClass7_0.<GenerateBPFAsync>b__0(IDocumentContainer container) in C:\AI\Opagax\Services\BPFService.cs:line 64
+   at QuestPDF.Fluent.Document.Compose(IDocumentContainer container)
+   at QuestPDF.Drawing.DocumentGenerator.ConfigureContent(IDocument document, DocumentSettings settings, Boolean useOriginalImages)
+   at QuestPDF.Drawing.DocumentGenerator.RenderSingleDocument[TCanvas](TCanvas canvas, IDocument document, DocumentSettings settings)
+   at QuestPDF.Drawing.DocumentGenerator.RenderDocument[TCanvas](TCanvas canvas, IDocument document, DocumentSettings settings)
+   at QuestPDF.Drawing.DocumentGenerator.GeneratePdf(SkWriteStream stream, IDocument document)
+   at QuestPDF.Fluent.GenerateExtensions.GeneratePdf(IDocument document)
+   at FormationManager.Services.BPFService.GenerateBPFAsync(DateTime debut, DateTime fin) in C:\AI\Opagax\Services\BPFService.cs:line 503
+   at FormationManager.Controllers.BpfController.Download(Nullable`1 debut, Nullable`1 fin) in C:\AI\Opagax\Controllers\BpfController.cs:line 35
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.InvokeInnerFilterAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResourceFilter>g__Awaited|25_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResourceExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeFilterPipelineAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Serilog.AspNetCore.RequestLoggingMiddleware.Invoke(HttpContext httpContext)
+[2026-02-02 23:13:11.614 +01:00 ERR] An unhandled exception has occurred while executing the request. {"EventId":{"Id":1,"Name":"UnhandledException"},"SourceContext":"Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddleware","RequestId":"0HNJ2L10B3KSK:00000001","RequestPath":"/Bpf/Download","ConnectionId":"0HNJ2L10B3KSK","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+QuestPDF.Drawing.Exceptions.DocumentComposeException: The 'Page.Footer' layer has already been defined. Please call this method only once.
+   at QuestPDF.Fluent.PageDescriptor.Footer()
+   at FormationManager.Services.BPFService.<>c__DisplayClass7_0.<GenerateBPFAsync>b__4(PageDescriptor page) in C:\AI\Opagax\Services\BPFService.cs:line 460
+   at QuestPDF.Fluent.PageExtensions.Page(IDocumentContainer document, Action`1 handler)
+   at FormationManager.Services.BPFService.<>c__DisplayClass7_0.<GenerateBPFAsync>b__0(IDocumentContainer container) in C:\AI\Opagax\Services\BPFService.cs:line 64
+   at QuestPDF.Fluent.Document.Compose(IDocumentContainer container)
+   at QuestPDF.Drawing.DocumentGenerator.ConfigureContent(IDocument document, DocumentSettings settings, Boolean useOriginalImages)
+   at QuestPDF.Drawing.DocumentGenerator.RenderSingleDocument[TCanvas](TCanvas canvas, IDocument document, DocumentSettings settings)
+   at QuestPDF.Drawing.DocumentGenerator.RenderDocument[TCanvas](TCanvas canvas, IDocument document, DocumentSettings settings)
+   at QuestPDF.Drawing.DocumentGenerator.GeneratePdf(SkWriteStream stream, IDocument document)
+   at QuestPDF.Fluent.GenerateExtensions.GeneratePdf(IDocument document)
+   at FormationManager.Services.BPFService.GenerateBPFAsync(DateTime debut, DateTime fin) in C:\AI\Opagax\Services\BPFService.cs:line 503
+   at FormationManager.Controllers.BpfController.Download(Nullable`1 debut, Nullable`1 fin) in C:\AI\Opagax\Controllers\BpfController.cs:line 35
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.InvokeInnerFilterAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResourceFilter>g__Awaited|25_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResourceExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeFilterPipelineAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Serilog.AspNetCore.RequestLoggingMiddleware.Invoke(HttpContext httpContext)
+   at Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddlewareImpl.<Invoke>g__Awaited|10_0(ExceptionHandlerMiddlewareImpl middleware, HttpContext context, Task task)
+[2026-02-02 23:13:11.617 +01:00 ERR] Exception non gérée : The 'Page.Footer' layer has already been defined. Please call this method only once. {"SourceContext":"FormationManager.Infrastructure.Exceptions.GlobalExceptionHandler","RequestId":"0HNJ2L10B3KSK:00000001","RequestPath":"/Bpf/Download","ConnectionId":"0HNJ2L10B3KSK","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+QuestPDF.Drawing.Exceptions.DocumentComposeException: The 'Page.Footer' layer has already been defined. Please call this method only once.
+   at QuestPDF.Fluent.PageDescriptor.Footer()
+   at FormationManager.Services.BPFService.<>c__DisplayClass7_0.<GenerateBPFAsync>b__4(PageDescriptor page) in C:\AI\Opagax\Services\BPFService.cs:line 460
+   at QuestPDF.Fluent.PageExtensions.Page(IDocumentContainer document, Action`1 handler)
+   at FormationManager.Services.BPFService.<>c__DisplayClass7_0.<GenerateBPFAsync>b__0(IDocumentContainer container) in C:\AI\Opagax\Services\BPFService.cs:line 64
+   at QuestPDF.Fluent.Document.Compose(IDocumentContainer container)
+   at QuestPDF.Drawing.DocumentGenerator.ConfigureContent(IDocument document, DocumentSettings settings, Boolean useOriginalImages)
+   at QuestPDF.Drawing.DocumentGenerator.RenderSingleDocument[TCanvas](TCanvas canvas, IDocument document, DocumentSettings settings)
+   at QuestPDF.Drawing.DocumentGenerator.RenderDocument[TCanvas](TCanvas canvas, IDocument document, DocumentSettings settings)
+   at QuestPDF.Drawing.DocumentGenerator.GeneratePdf(SkWriteStream stream, IDocument document)
+   at QuestPDF.Fluent.GenerateExtensions.GeneratePdf(IDocument document)
+   at FormationManager.Services.BPFService.GenerateBPFAsync(DateTime debut, DateTime fin) in C:\AI\Opagax\Services\BPFService.cs:line 503
+   at FormationManager.Controllers.BpfController.Download(Nullable`1 debut, Nullable`1 fin) in C:\AI\Opagax\Controllers\BpfController.cs:line 35
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.InvokeInnerFilterAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResourceFilter>g__Awaited|25_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResourceExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeFilterPipelineAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Serilog.AspNetCore.RequestLoggingMiddleware.Invoke(HttpContext httpContext)
+   at Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddlewareImpl.<Invoke>g__Awaited|10_0(ExceptionHandlerMiddlewareImpl middleware, HttpContext context, Task task)
+[2026-02-02 23:13:20.606 +01:00 INF] HTTP GET / responded 302 in 3.5936 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJ2L10B3KSM:00000001","ConnectionId":"0HNJ2L10B3KSM","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":8}
+[2026-02-02 23:13:20.704 +01:00 INF] HTTP GET /Account/Login responded 200 in 95.4066 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJ2L10B3KSM:00000002","ConnectionId":"0HNJ2L10B3KSM","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}
+[2026-02-02 23:14:49.837 +01:00 ERR] HTTP GET /Bpf/Download responded 500 in 56.2783 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJ2L10B3KSK:00000002","ConnectionId":"0HNJ2L10B3KSK","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":14}
+QuestPDF.Drawing.Exceptions.DocumentComposeException: The 'Page.Footer' layer has already been defined. Please call this method only once.
+   at QuestPDF.Fluent.PageDescriptor.Footer()
+   at FormationManager.Services.BPFService.<>c__DisplayClass7_0.<GenerateBPFAsync>b__4(PageDescriptor page) in C:\AI\Opagax\Services\BPFService.cs:line 460
+   at QuestPDF.Fluent.PageExtensions.Page(IDocumentContainer document, Action`1 handler)
+   at FormationManager.Services.BPFService.<>c__DisplayClass7_0.<GenerateBPFAsync>b__0(IDocumentContainer container) in C:\AI\Opagax\Services\BPFService.cs:line 64
+   at QuestPDF.Fluent.Document.Compose(IDocumentContainer container)
+   at QuestPDF.Drawing.DocumentGenerator.ConfigureContent(IDocument document, DocumentSettings settings, Boolean useOriginalImages)
+   at QuestPDF.Drawing.DocumentGenerator.RenderSingleDocument[TCanvas](TCanvas canvas, IDocument document, DocumentSettings settings)
+   at QuestPDF.Drawing.DocumentGenerator.RenderDocument[TCanvas](TCanvas canvas, IDocument document, DocumentSettings settings)
+   at QuestPDF.Drawing.DocumentGenerator.GeneratePdf(SkWriteStream stream, IDocument document)
+   at QuestPDF.Fluent.GenerateExtensions.GeneratePdf(IDocument document)
+   at FormationManager.Services.BPFService.GenerateBPFAsync(DateTime debut, DateTime fin) in C:\AI\Opagax\Services\BPFService.cs:line 503
+   at FormationManager.Controllers.BpfController.Download(Nullable`1 debut, Nullable`1 fin) in C:\AI\Opagax\Controllers\BpfController.cs:line 35
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.InvokeInnerFilterAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResourceFilter>g__Awaited|25_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResourceExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeFilterPipelineAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Serilog.AspNetCore.RequestLoggingMiddleware.Invoke(HttpContext httpContext)
+[2026-02-02 23:14:49.838 +01:00 ERR] An unhandled exception has occurred while executing the request. {"EventId":{"Id":1,"Name":"UnhandledException"},"SourceContext":"Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddleware","RequestId":"0HNJ2L10B3KSK:00000002","RequestPath":"/Bpf/Download","ConnectionId":"0HNJ2L10B3KSK","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":14}
+QuestPDF.Drawing.Exceptions.DocumentComposeException: The 'Page.Footer' layer has already been defined. Please call this method only once.
+   at QuestPDF.Fluent.PageDescriptor.Footer()
+   at FormationManager.Services.BPFService.<>c__DisplayClass7_0.<GenerateBPFAsync>b__4(PageDescriptor page) in C:\AI\Opagax\Services\BPFService.cs:line 460
+   at QuestPDF.Fluent.PageExtensions.Page(IDocumentContainer document, Action`1 handler)
+   at FormationManager.Services.BPFService.<>c__DisplayClass7_0.<GenerateBPFAsync>b__0(IDocumentContainer container) in C:\AI\Opagax\Services\BPFService.cs:line 64
+   at QuestPDF.Fluent.Document.Compose(IDocumentContainer container)
+   at QuestPDF.Drawing.DocumentGenerator.ConfigureContent(IDocument document, DocumentSettings settings, Boolean useOriginalImages)
+   at QuestPDF.Drawing.DocumentGenerator.RenderSingleDocument[TCanvas](TCanvas canvas, IDocument document, DocumentSettings settings)
+   at QuestPDF.Drawing.DocumentGenerator.RenderDocument[TCanvas](TCanvas canvas, IDocument document, DocumentSettings settings)
+   at QuestPDF.Drawing.DocumentGenerator.GeneratePdf(SkWriteStream stream, IDocument document)
+   at QuestPDF.Fluent.GenerateExtensions.GeneratePdf(IDocument document)
+   at FormationManager.Services.BPFService.GenerateBPFAsync(DateTime debut, DateTime fin) in C:\AI\Opagax\Services\BPFService.cs:line 503
+   at FormationManager.Controllers.BpfController.Download(Nullable`1 debut, Nullable`1 fin) in C:\AI\Opagax\Controllers\BpfController.cs:line 35
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.InvokeInnerFilterAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResourceFilter>g__Awaited|25_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResourceExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeFilterPipelineAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Serilog.AspNetCore.RequestLoggingMiddleware.Invoke(HttpContext httpContext)
+   at Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddlewareImpl.<Invoke>g__Awaited|10_0(ExceptionHandlerMiddlewareImpl middleware, HttpContext context, Task task)
+[2026-02-02 23:14:49.839 +01:00 ERR] Exception non gérée : The 'Page.Footer' layer has already been defined. Please call this method only once. {"SourceContext":"FormationManager.Infrastructure.Exceptions.GlobalExceptionHandler","RequestId":"0HNJ2L10B3KSK:00000002","RequestPath":"/Bpf/Download","ConnectionId":"0HNJ2L10B3KSK","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":14}
+QuestPDF.Drawing.Exceptions.DocumentComposeException: The 'Page.Footer' layer has already been defined. Please call this method only once.
+   at QuestPDF.Fluent.PageDescriptor.Footer()
+   at FormationManager.Services.BPFService.<>c__DisplayClass7_0.<GenerateBPFAsync>b__4(PageDescriptor page) in C:\AI\Opagax\Services\BPFService.cs:line 460
+   at QuestPDF.Fluent.PageExtensions.Page(IDocumentContainer document, Action`1 handler)
+   at FormationManager.Services.BPFService.<>c__DisplayClass7_0.<GenerateBPFAsync>b__0(IDocumentContainer container) in C:\AI\Opagax\Services\BPFService.cs:line 64
+   at QuestPDF.Fluent.Document.Compose(IDocumentContainer container)
+   at QuestPDF.Drawing.DocumentGenerator.ConfigureContent(IDocument document, DocumentSettings settings, Boolean useOriginalImages)
+   at QuestPDF.Drawing.DocumentGenerator.RenderSingleDocument[TCanvas](TCanvas canvas, IDocument document, DocumentSettings settings)
+   at QuestPDF.Drawing.DocumentGenerator.RenderDocument[TCanvas](TCanvas canvas, IDocument document, DocumentSettings settings)
+   at QuestPDF.Drawing.DocumentGenerator.GeneratePdf(SkWriteStream stream, IDocument document)
+   at QuestPDF.Fluent.GenerateExtensions.GeneratePdf(IDocument document)
+   at FormationManager.Services.BPFService.GenerateBPFAsync(DateTime debut, DateTime fin) in C:\AI\Opagax\Services\BPFService.cs:line 503
+   at FormationManager.Controllers.BpfController.Download(Nullable`1 debut, Nullable`1 fin) in C:\AI\Opagax\Controllers\BpfController.cs:line 35
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.TaskOfIActionResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.InvokeInnerFilterAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeNextResourceFilter>g__Awaited|25_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Rethrow(ResourceExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.InvokeFilterPipelineAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Serilog.AspNetCore.RequestLoggingMiddleware.Invoke(HttpContext httpContext)
+   at Microsoft.AspNetCore.Diagnostics.ExceptionHandlerMiddlewareImpl.<Invoke>g__Awaited|10_0(ExceptionHandlerMiddlewareImpl middleware, HttpContext context, Task task)
+[2026-02-02 23:15:59.492 +01:00 INF] Démarrage de l'application FormatiX {"EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":2}
+[2026-02-02 23:16:00.724 +01:00 INF] Base de données migrée avec succès {"SourceContext":"Program","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":2}
+[2026-02-02 23:16:01.065 +01:00 INF] Base de données initialisée avec succès {"SourceContext":"Program","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":2}
+[2026-02-02 23:16:01.067 +01:00 INF] Application FormatiX démarrée avec succès {"EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":2}
+[2026-02-02 23:16:05.192 +01:00 DBG] Ollama n'est pas disponible {"SourceContext":"FormationManager.Infrastructure.AI.OllamaAIService","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":8}
+System.Net.Http.HttpRequestException: Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée. (localhost:11434)
+ ---> System.Net.Sockets.SocketException (10061): Aucune connexion n’a pu être établie car l’ordinateur cible l’a expressément refusée.
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)
+   at System.Net.Sockets.Socket.<ConnectAsync>g__WaitForConnectWithCancellation|285_0(AwaitableSocketAsyncEventArgs saea, ValueTask connectTask, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at System.Net.Http.HttpConnectionPool.ConnectToTcpHostAsync(String host, Int32 port, HttpRequestMessage initialRequest, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.ConnectAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.CreateHttp11ConnectionAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.InjectNewHttp11ConnectionAsync(QueueItem queueItem)
+   at System.Threading.Tasks.TaskCompletionSourceWithCancellation`1.WaitWithCancellationAsync(CancellationToken cancellationToken)
+   at System.Net.Http.HttpConnectionPool.SendWithVersionDetectionAndRetryAsync(HttpRequestMessage request, Boolean async, Boolean doRequestAuth, CancellationToken cancellationToken)
+   at System.Net.Http.RedirectHandler.SendAsync(HttpRequestMessage request, Boolean async, CancellationToken cancellationToken)
+   at Microsoft.Extensions.Http.Logging.LoggingHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+   at Microsoft.Extensions.Http.Logging.LoggingScopeHttpMessageHandler.<SendCoreAsync>g__Core|4_0(HttpRequestMessage request, Boolean useAsync, CancellationToken cancellationToken)
+   at System.Net.Http.HttpClient.<SendAsync>g__Core|83_0(HttpRequestMessage request, HttpCompletionOption completionOption, CancellationTokenSource cts, Boolean disposeCts, CancellationTokenSource pendingRequestsCts, CancellationToken originalCancellationToken)
+   at FormationManager.Infrastructure.AI.OllamaAIService.IsServiceAvailableAsync() in C:\AI\Opagax\Infrastructure\AI\OllamaAIService.cs:line 136
+[2026-02-02 23:16:05.222 +01:00 WRN] Ollama n'est pas disponible. Tentative de démarrage automatique: ollama serve {"SourceContext":"FormationManager.Infrastructure.AI.OllamaAutoStartHostedService","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":8}
+[2026-02-02 23:16:05.224 +01:00 WRN] AutoStart Ollama a échoué: An error occurred trying to start process 'ollama' with working directory 'C:\AI\Opagax'. Le fichier spécifié est introuvable. {"SourceContext":"FormationManager.Infrastructure.AI.OllamaAutoStartHostedService","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":8}
+System.ComponentModel.Win32Exception (2): An error occurred trying to start process 'ollama' with working directory 'C:\AI\Opagax'. Le fichier spécifié est introuvable.
+   at System.Diagnostics.Process.StartWithCreateProcess(ProcessStartInfo startInfo)
+   at System.Diagnostics.Process.Start(ProcessStartInfo startInfo)
+   at FormationManager.Infrastructure.AI.OllamaAutoStartHostedService.StartAsync(CancellationToken cancellationToken) in C:\AI\Opagax\Infrastructure\AI\OllamaAutoStartHostedService.cs:line 68
+[2026-02-02 23:16:05.257 +01:00 INF] Now listening on: http://localhost:5000 {"EventId":{"Id":14,"Name":"ListeningOnAddress"},"SourceContext":"Microsoft.Hosting.Lifetime","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":8}
+[2026-02-02 23:16:05.258 +01:00 INF] Application started. Press Ctrl+C to shut down. {"SourceContext":"Microsoft.Hosting.Lifetime","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":8}
+[2026-02-02 23:16:05.258 +01:00 INF] Hosting environment: Production {"SourceContext":"Microsoft.Hosting.Lifetime","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":8}
+[2026-02-02 23:16:05.258 +01:00 INF] Content root path: C:\AI\Opagax {"SourceContext":"Microsoft.Hosting.Lifetime","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":8}
+[2026-02-02 23:16:20.012 +01:00 WRN] Failed to determine the https port for redirect. {"EventId":{"Id":3,"Name":"FailedToDeterminePort"},"SourceContext":"Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionMiddleware","RequestId":"0HNJ2L2OJ11DK:00000001","RequestPath":"/","ConnectionId":"0HNJ2L2OJ11DK","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":8}
+[2026-02-02 23:16:20.062 +01:00 INF] HTTP GET / responded 302 in 49.9807 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJ2L2OJ11DK:00000001","ConnectionId":"0HNJ2L2OJ11DK","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":8}
+[2026-02-02 23:16:20.154 +01:00 INF] HTTP GET /Account/Login responded 200 in 78.0323 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJ2L2OJ11DK:00000002","ConnectionId":"0HNJ2L2OJ11DK","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":12}
+[2026-02-02 23:16:44.793 +01:00 INF] HTTP GET /Bpf/Download responded 200 in 547.7772 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJ2L2OJ11DL:00000001","ConnectionId":"0HNJ2L2OJ11DL","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":6}

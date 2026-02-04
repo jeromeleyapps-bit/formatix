@@ -1,0 +1,17 @@
+@model FormationManager.Models.Session
+@{
+    ViewData["Title"] = "Supprimer la session";
+}
+
+<div class="card">
+    <div class="card-body">
+        <p>Confirmer la suppression de la session <strong>@Model.Formation?.Titre</strong> ?</p>
+        <form asp-action="Delete" method="post">
+            <input type="hidden" asp-for="Id" />
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-danger">Supprimer</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Annuler</a>
+            </div>
+        </form>
+    </div>
+</div>

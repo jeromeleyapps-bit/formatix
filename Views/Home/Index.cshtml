@@ -1,0 +1,237 @@
+@{
+    ViewData["Title"] = "Tableau de bord";
+}
+
+@functions {
+    private string GetTimeAgo(DateTime date)
+    {
+        var timeSpan = DateTime.Now - date;
+        if (timeSpan.TotalMinutes < 60)
+            return $"Il y a {(int)timeSpan.TotalMinutes} min";
+        else if (timeSpan.TotalHours < 24)
+            return $"Il y a {(int)timeSpan.TotalHours}h";
+        else if (timeSpan.TotalDays < 7)
+            return $"Il y a {(int)timeSpan.TotalDays}j";
+        else
+            return date.ToString("dd/MM/yyyy");
+    }
+}
+
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card card-opagax fade-in">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h5 class="text-muted mb-0">Formations</h5>
+                        <h3 class="mb-0">@ViewBag.TotalFormations</h3>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-graduation-cap fa-2x text-primary"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card success card-opagax fade-in">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h5 class="text-muted mb-0">Sessions</h5>
+                        <h3 class="mb-0">@ViewBag.TotalSessions</h3>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-calendar-alt fa-2x text-success"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card warning card-opagax fade-in">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h5 class="text-muted mb-0">Stagiaires</h5>
+                        <h3 class="mb-0">@ViewBag.TotalStagiaires</h3>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-user-graduate fa-2x text-warning"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card stats-card danger card-opagax fade-in">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h5 class="text-muted mb-0">CA Annuel</h5>
+                        <h3 class="mb-0">@(((decimal)ViewBag.CAAnnee / 1000).ToString("F1"))k€</h3>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-euro-sign fa-2x text-danger"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xl-8 col-lg-7 mb-4">
+        <div class="card card-opagax fade-in">
+            <div class="card-header">
+                @{
+                    bool isFormateur = ViewBag.IsFormateur != null && (bool)ViewBag.IsFormateur;
+                    var titreSessions = isFormateur ? "Mes prochaines sessions" : "Sessions à venir";
+                }
+                <h6 class="m-0 font-weight-bold text-primary">@titreSessions</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Formation</th>
+                                <th>Date</th>
+                                <th>Stagiaires</th>
+                                <th>Statut</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (ViewBag.SessionsAVenir != null)
+                            {
+                                var sessions = ViewBag.SessionsAVenir as System.Collections.IEnumerable;
+                                bool hasSessions = false;
+                                @foreach (dynamic session in sessions)
+                                {
+                                    hasSessions = true;
+                                    <tr>
+                                        <td>@session.FormationTitre</td>
+                                        <td>@(((DateTime)session.DateDebut).ToString("dd/MM/yyyy"))</td>
+                                        <td>@session.NombreStagiaires/@session.NombreMax</td>
+                                        <td>
+                                            @{
+                                                var statut = session.Statut?.ToString() ?? "Programmée";
+                                                var badgeClass = statut == "En cours" ? "bg-warning" : "bg-info";
+                                            }
+                                            <span class="badge @badgeClass">@statut</span>
+                                        </td>
+                                    </tr>
+                                }
+                                @if (!hasSessions)
+                                {
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted">Aucune session à venir</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">Aucune session à venir</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-4 col-lg-5 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">Tâches en attente</h6>
+            </div>
+            <div class="card-body">
+                <div class="list-group list-group-flush">
+                    @if (ViewBag.DocumentsEnAttente != null)
+                    {
+                        var docs = ViewBag.DocumentsEnAttente as System.Collections.IEnumerable;
+                        bool hasDocs = false;
+                        @foreach (dynamic doc in docs)
+                        {
+                            hasDocs = true;
+                            var timeAgo = GetTimeAgo((DateTime)doc.DateCreation);
+                            var typeDoc = doc.TypeDocument?.ToString() ?? "Document";
+                            var titre = doc.Session?.Formation?.Titre?.ToString() ?? "Document";
+                            <a href="/Documents" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1">Valider @typeDoc</h6>
+                                    <small>@timeAgo</small>
+                                </div>
+                                <p class="mb-1">@titre</p>
+                            </a>
+                        }
+                        @if (!hasDocs)
+                        {
+                            <div class="list-group-item">
+                                <p class="mb-0 text-muted text-center">Aucune tâche en attente</p>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="list-group-item">
+                            <p class="mb-0 text-muted text-center">Aucune tâche en attente</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">Conformité Qualiopi</h6>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-sm-4 text-center">
+                        <div class="h4 mb-0 text-success">@ViewBag.TauxConformite%</div>
+                        <div class="small text-muted">Taux global</div>
+                    </div>
+                    <div class="col-sm-4 text-center">
+                        <div class="h4 mb-0 text-info">@ViewBag.IndicateursValides/@ViewBag.TotalIndicateurs</div>
+                        <div class="small text-muted">Indicateurs validés</div>
+                    </div>
+                    <div class="col-sm-4 text-center">
+                        <div class="h4 mb-0 text-warning">@ViewBag.ActionsRequises</div>
+                        <div class="small text-muted">Actions requises</div>
+                    </div>
+                </div>
+                
+                <div class="progress mb-3">
+                    <div class="progress-bar bg-success" style="width: @ViewBag.TauxConformite%"></div>
+                </div>
+                
+                <small class="text-muted">Dernière mise à jour : @DateTime.Now.ToString("dd/MM/yyyy")</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">Activité récente</h6>
+            </div>
+            <div class="card-body">
+                <div class="timeline">
+                    <div class="text-center text-muted">
+                        <p class="mb-0">Aucune activité récente</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,74 @@
+@model FormationManager.Models.Formation
+@{
+    ViewData["Title"] = "Modifier la formation";
+}
+
+<div class="card">
+    <div class="card-body">
+        <form asp-action="Edit" method="post">
+            <input type="hidden" asp-for="Id" />
+            @if (ViewBag.Sites != null)
+            {
+                <div class="mb-3">
+                    <label class="form-label">Site</label>
+                    <select asp-for="SiteId" class="form-select"
+                            asp-items="@(new SelectList(ViewBag.Sites, "SiteId", "Name"))">
+                    </select>
+                </div>
+            }
+            <div class="mb-3">
+                <label asp-for="Titre" class="form-label"></label>
+                <input asp-for="Titre" class="form-control" />
+                <span asp-validation-for="Titre" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Description" class="form-label"></label>
+                <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="DureeHeures" class="form-label"></label>
+                    <input asp-for="DureeHeures" class="form-control" />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="PrixIndicatif" class="form-label"></label>
+                    <input asp-for="PrixIndicatif" class="form-control" />
+                </div>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Programme" class="form-label"></label>
+                <textarea asp-for="Programme" class="form-control" rows="3"></textarea>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Prerequis" class="form-label"></label>
+                <textarea asp-for="Prerequis" class="form-control" rows="2"></textarea>
+            </div>
+            <div class="mb-3">
+                <label asp-for="ModalitesPedagogiques" class="form-label"></label>
+                <textarea asp-for="ModalitesPedagogiques" class="form-control" rows="2"></textarea>
+            </div>
+            <div class="mb-3">
+                <label asp-for="ModalitesEvaluation" class="form-label"></label>
+                <textarea asp-for="ModalitesEvaluation" class="form-control" rows="2"></textarea>
+            </div>
+            <div class="mb-3">
+                <label asp-for="ReferencesQualiopi" class="form-label"></label>
+                <textarea asp-for="ReferencesQualiopi" class="form-control" rows="2"></textarea>
+            </div>
+            <div class="form-check mb-3">
+                <input asp-for="EstPublique" class="form-check-input" />
+                <label asp-for="EstPublique" class="form-check-label"></label>
+            </div>
+            <div class="mb-3">
+                <label for="raisonModification" class="form-label">Raison de la modification (pour traçabilité Qualiopi)</label>
+                <input type="text" name="raisonModification" id="raisonModification" class="form-control" 
+                       placeholder="Ex: Amélioration du programme, Mise à jour réglementaire, Adaptation pédagogique..." />
+                <small class="form-text text-muted">Cette information sera enregistrée dans l'historique des versions de la formation</small>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Annuler</a>
+            </div>
+        </form>
+    </div>
+</div>

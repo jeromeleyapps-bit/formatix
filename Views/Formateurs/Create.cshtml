@@ -1,0 +1,193 @@
+@model FormationManager.Models.Formateur
+@{
+    ViewData["Title"] = "Nouveau formateur";
+    var utilisateurs = ViewBag.Utilisateurs as List<dynamic> ?? new List<dynamic>();
+    var sites = ViewBag.Sites as List<FormationManager.Models.Site> ?? new List<FormationManager.Models.Site>();
+    var showSite = sites.Any();
+}
+
+<div class="card">
+    <div class="card-header">
+        <h5>Nouveau formateur</h5>
+    </div>
+    <div class="card-body">
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger">
+                <h6>Erreurs de validation :</h6>
+                <ul>
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <li>@error.ErrorMessage</li>
+                    }
+                </ul>
+            </div>
+        }
+
+        <form asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+
+            @if (showSite)
+            {
+                <div class="mb-3">
+                    <label asp-for="SiteId" class="form-label">Site</label>
+                    <select asp-for="SiteId" class="form-select">
+                        <option value="">-- Sélectionner un site --</option>
+                        @foreach (var site in sites)
+                        {
+                            <option value="@site.SiteId">@site.Name</option>
+                        }
+                    </select>
+                </div>
+            }
+
+            <div class="mb-3">
+                <label class="form-label">Lier à un utilisateur existant (optionnel)</label>
+                <select asp-for="UtilisateurId" class="form-select">
+                    <option value="">-- Aucun (formateur externe) --</option>
+                    @foreach (var user in utilisateurs)
+                    {
+                        <option value="@user.Id">@user.NomComplet</option>
+                    }
+                </select>
+                <small class="text-muted">Si vous liez à un utilisateur, ses informations seront pré-remplies</small>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Prenom" class="form-label">Prénom *</label>
+                    <input asp-for="Prenom" class="form-control" required />
+                    <span asp-validation-for="Prenom" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Nom" class="form-label">Nom *</label>
+                    <input asp-for="Nom" class="form-control" required />
+                    <span asp-validation-for="Nom" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Email" class="form-label">Email</label>
+                    <input asp-for="Email" type="email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Telephone" class="form-label">Téléphone</label>
+                    <input asp-for="Telephone" class="form-control" />
+                    <span asp-validation-for="Telephone" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label asp-for="StatutProfessionnel" class="form-label">Statut professionnel</label>
+                    <select asp-for="StatutProfessionnel" class="form-select">
+                        <option value="">-- Sélectionner --</option>
+                        <option value="Salarié">Salarié</option>
+                        <option value="Intermittent">Intermittent</option>
+                        <option value="Auto-entrepreneur">Auto-entrepreneur</option>
+                        <option value="Freelance">Freelance</option>
+                        <option value="Bénévole">Bénévole</option>
+                        <option value="Autre">Autre</option>
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label asp-for="NumeroFormateur" class="form-label">Numéro de formateur <span class="text-muted">(optionnel)</span></label>
+                    <input asp-for="NumeroFormateur" class="form-control" />
+                    <small class="text-muted">Numéro d'enregistrement si existant</small>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label asp-for="AntenneRattachement" class="form-label">Antenne de rattachement</label>
+                    @{
+                        var sitesForAntenne = ViewBag.SitesForAntenne as List<FormationManager.Models.Site>;
+                        if (sitesForAntenne == null)
+                        {
+                            sitesForAntenne = ViewBag.Sites as List<FormationManager.Models.Site> ?? new List<FormationManager.Models.Site>();
+                        }
+                    }
+                    <select asp-for="AntenneRattachement" class="form-select">
+                        <option value="">-- Sélectionner une antenne --</option>
+                        @if (sitesForAntenne != null && sitesForAntenne.Any())
+                        {
+                            @foreach (var site in sitesForAntenne)
+                            {
+                                <option value="@site.Name">@site.Name</option>
+                            }
+                        }
+                        else
+                        {
+                            <option value="" disabled>Aucun site disponible</option>
+                        }
+                    </select>
+                    @if (sitesForAntenne == null || !sitesForAntenne.Any())
+                    {
+                        <small class="text-warning d-block mt-1">
+                            <i class="fas fa-exclamation-triangle"></i> Aucun site actif trouvé. Créez d'abord des sites dans les paramètres.
+                        </small>
+                    }
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Biographie" class="form-label">Biographie</label>
+                <textarea asp-for="Biographie" class="form-control" rows="3"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Competences" class="form-label">Compétences</label>
+                <textarea asp-for="Competences" class="form-control" rows="3"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Experience" class="form-label">Expérience</label>
+                <textarea asp-for="Experience" class="form-control" rows="3"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Formations" class="form-label">Formations</label>
+                <textarea asp-for="Formations" class="form-control" rows="3"></textarea>
+            </div>
+
+            <div class="form-check mb-3">
+                <input asp-for="Actif" class="form-check-input" checked />
+                <label asp-for="Actif" class="form-check-label">Formateur actif</label>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Créer</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Annuler</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const utilisateurSelect = document.getElementById('UtilisateurId');
+    const prenomInput = document.getElementById('Prenom');
+    const nomInput = document.getElementById('Nom');
+    const emailInput = document.getElementById('Email');
+    const telephoneInput = document.getElementById('Telephone');
+
+    if (utilisateurSelect && prenomInput && nomInput && emailInput && telephoneInput) {
+        utilisateurSelect.addEventListener('change', function() {
+            const userId = this.value;
+            if (userId) {
+                // Récupérer les infos de l'utilisateur via AJAX
+                fetch(`/Formateurs/GetUserInfo/${userId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data) {
+                            if (!prenomInput.value) prenomInput.value = data.prenom || '';
+                            if (!nomInput.value) nomInput.value = data.nom || '';
+                            if (!emailInput.value) emailInput.value = data.email || '';
+                            if (!telephoneInput.value) telephoneInput.value = data.telephone || '';
+                        }
+                    })
+                    .catch(err => console.error('Erreur:', err));
+            }
+        });
+    }
+});
+</script>

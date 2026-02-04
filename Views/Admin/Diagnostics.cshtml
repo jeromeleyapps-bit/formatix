@@ -1,0 +1,201 @@
+@model FormationManager.Models.SystemDiagnosticsViewModel
+@{
+    ViewData["Title"] = "Diagnostic système";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4>Diagnostic système</h4>
+    <a asp-controller="Admin" asp-action="Dashboard" class="btn btn-outline-secondary btn-sm">
+        <i class="fas fa-arrow-left me-1"></i> Retour au dashboard
+    </a>
+</div>
+
+@if (Model.HasWarnings)
+{
+    <div class="alert alert-warning">
+        <h6 class="fw-bold mb-2"><i class="fas fa-exclamation-triangle me-1"></i> Points à surveiller</h6>
+        <ul class="mb-0">
+            @foreach (var w in Model.Warnings)
+            {
+                <li>@w</li>
+            }
+        </ul>
+    </div>
+}
+else
+{
+    <div class="alert alert-success">
+        <i class="fas fa-check-circle me-1"></i> Aucun problème majeur détecté. La configuration semble correcte.
+    </div>
+}
+
+<div class="card mb-3">
+    <div class="card-header">
+        <h6 class="m-0 fw-bold">Base de données</h6>
+    </div>
+    <div class="card-body">
+        <p class="mb-1">
+            <strong>Connexion :</strong>
+            @if (Model.DatabaseCanConnect)
+            {
+                <span class="badge bg-success">OK</span>
+            }
+            else
+            {
+                <span class="badge bg-danger">Échec</span>
+                <span class="text-muted ms-2">@Model.DatabaseError</span>
+            }
+        </p>
+        <p class="mb-1"><strong>Fichier SQLite :</strong> <code>@Model.DatabasePath</code></p>
+        <p class="mb-0">
+            <strong>Statut du fichier :</strong>
+            @if (Model.DatabaseFileExists)
+            {
+                <span class="badge bg-success">Présent</span>
+                if (Model.DatabaseFileSizeBytes.HasValue)
+                {
+                    var sizeMb = Model.DatabaseFileSizeBytes.Value / (1024d * 1024d);
+                    <span class="text-muted ms-2">(@sizeMb.ToString("F1") Mo)</span>
+                }
+            }
+            else
+            {
+                <span class="badge bg-danger">Introuvable</span>
+            }
+        </p>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header">
+        <h6 class="m-0 fw-bold">Fichiers et espace disque</h6>
+    </div>
+    <div class="card-body">
+        <p class="mb-1"><strong>Racine application :</strong> <code>@Model.ContentRootPath</code></p>
+        <p class="mb-2">
+            <strong>Espace disque libre (approx.) :</strong>
+            @if (Model.ContentRootFreeSpaceBytes.HasValue)
+            {
+                var freeGb = Model.ContentRootFreeSpaceBytes.Value / (1024d * 1024d * 1024d);
+                <span>@freeGb.ToString("F1") Go libres</span>
+            }
+            else
+            {
+                <span class="text-muted">Non déterminé</span>
+            }
+        </p>
+        <div class="row">
+            <div class="col-md-4 mb-2">
+                <div><strong>Dossier uploads</strong></div>
+                <div><code>@Model.UploadsPath</code></div>
+                <div>
+                    @if (Model.UploadsFolderOk)
+                    {
+                        <span class="badge bg-success">Accessible</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Inaccessible</span>
+                    }
+                </div>
+            </div>
+            <div class="col-md-4 mb-2">
+                <div><strong>Dossier exemples</strong></div>
+                <div><code>@Model.ExamplesPath</code></div>
+                <div>
+                    @if (Model.ExamplesFolderOk)
+                    {
+                        <span class="badge bg-success">Accessible</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Inaccessible</span>
+                    }
+                </div>
+            </div>
+            <div class="col-md-4 mb-2">
+                <div><strong>Dossier generated</strong></div>
+                <div><code>@Model.GeneratedPath</code></div>
+                <div>
+                    @if (Model.GeneratedFolderOk)
+                    {
+                        <span class="badge bg-success">Accessible</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Inaccessible</span>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header">
+        <h6 class="m-0 fw-bold">Inscriptions à distance</h6>
+    </div>
+    <div class="card-body">
+        <p class="mb-1">
+            <strong>BaseUrlInscription :</strong>
+            @if (Model.BaseUrlInscriptionConfigured)
+            {
+                <code>@Model.BaseUrlInscription</code>
+            }
+            else
+            {
+                <span class="text-muted">Non configuré (l'application utilisera l'URL courante du serveur)</span>
+            }
+        </p>
+        <p class="mb-0">
+            <strong>URL publique valide :</strong>
+            @if (Model.BaseUrlInscriptionConfigured && Model.BaseUrlInscriptionLooksPublic)
+            {
+                <span class="badge bg-success">Oui</span>
+            }
+            else if (Model.BaseUrlInscriptionConfigured)
+            {
+                <span class="badge bg-warning text-dark">À vérifier</span>
+            }
+            else
+            {
+                <span class="badge bg-secondary">Par défaut</span>
+            }
+        </p>
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-header">
+        <h6 class="m-0 fw-bold">Multi-sites / Sync</h6>
+    </div>
+    <div class="card-body">
+        <p class="mb-1">
+            <strong>Sync:SiteId :</strong>
+            @if (Model.SyncSiteIdDefined)
+            {
+                <code>@Model.SyncSiteId</code>
+            }
+            else
+            {
+                <span class="text-muted">Non défini</span>
+            }
+        </p>
+        <p class="mb-0">
+            <strong>Référencé dans la liste des sites :</strong>
+            @if (Model.SyncSiteIdDefined && Model.SyncSiteIdKnownInSites)
+            {
+                <span class="badge bg-success">Oui</span>
+            }
+            else if (Model.SyncSiteIdDefined)
+            {
+                <span class="badge bg-warning text-dark">Non (à vérifier)</span>
+            }
+            else
+            {
+                <span class="badge bg-secondary">Non applicable</span>
+            }
+        </p>
+    </div>
+</div>
+

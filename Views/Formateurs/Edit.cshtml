@@ -1,0 +1,132 @@
+@model FormationManager.Models.Formateur
+@{
+    ViewData["Title"] = "Modifier le formateur";
+    var utilisateurs = ViewBag.Utilisateurs as List<dynamic> ?? new List<dynamic>();
+    var sites = ViewBag.Sites as List<FormationManager.Models.Site> ?? new List<FormationManager.Models.Site>();
+    var showSite = sites.Any();
+}
+
+<div class="card">
+    <div class="card-header">
+        <h5>Modifier le formateur</h5>
+    </div>
+    <div class="card-body">
+        <form asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+
+            @if (showSite)
+            {
+                <div class="mb-3">
+                    <label asp-for="SiteId" class="form-label">Site</label>
+                    <select asp-for="SiteId" class="form-select">
+                        <option value="">-- Sélectionner un site --</option>
+                        @foreach (var site in sites)
+                        {
+                            <option value="@site.SiteId">@site.Name</option>
+                        }
+                    </select>
+                </div>
+            }
+
+            <div class="mb-3">
+                <label class="form-label">Lier à un utilisateur existant (optionnel)</label>
+                <select asp-for="UtilisateurId" class="form-select">
+                    <option value="">-- Aucun (formateur externe) --</option>
+                    @foreach (var user in utilisateurs)
+                    {
+                        <option value="@user.Id" selected="@(Model.UtilisateurId == user.Id)">@user.NomComplet</option>
+                    }
+                </select>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Prenom" class="form-label">Prénom *</label>
+                    <input asp-for="Prenom" class="form-control" required />
+                    <span asp-validation-for="Prenom" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Nom" class="form-label">Nom *</label>
+                    <input asp-for="Nom" class="form-control" required />
+                    <span asp-validation-for="Nom" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Email" class="form-label">Email</label>
+                    <input asp-for="Email" type="email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Telephone" class="form-label">Téléphone</label>
+                    <input asp-for="Telephone" class="form-control" />
+                    <span asp-validation-for="Telephone" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label asp-for="StatutProfessionnel" class="form-label">Statut professionnel</label>
+                    <select asp-for="StatutProfessionnel" class="form-select">
+                        <option value="">-- Sélectionner --</option>
+                        <option value="Salarié">Salarié</option>
+                        <option value="Intermittent">Intermittent</option>
+                        <option value="Auto-entrepreneur">Auto-entrepreneur</option>
+                        <option value="Freelance">Freelance</option>
+                        <option value="Bénévole">Bénévole</option>
+                        <option value="Autre">Autre</option>
+                    </select>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label asp-for="NumeroFormateur" class="form-label">Numéro de formateur</label>
+                    <input asp-for="NumeroFormateur" class="form-control" />
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label asp-for="AntenneRattachement" class="form-label">Antenne de rattachement</label>
+                    @{
+                        var sitesForAntenne = ViewBag.SitesForAntenne as List<FormationManager.Models.Site> ?? new List<FormationManager.Models.Site>();
+                    }
+                    <select asp-for="AntenneRattachement" class="form-select">
+                        <option value="">-- Sélectionner une antenne --</option>
+                        @foreach (var site in sitesForAntenne)
+                        {
+                            <option value="@site.Name" selected="@(Model.AntenneRattachement == site.Name)">@site.Name</option>
+                        }
+                    </select>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Biographie" class="form-label">Biographie</label>
+                <textarea asp-for="Biographie" class="form-control" rows="3"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Competences" class="form-label">Compétences</label>
+                <textarea asp-for="Competences" class="form-control" rows="3"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Experience" class="form-label">Expérience</label>
+                <textarea asp-for="Experience" class="form-control" rows="3"></textarea>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Formations" class="form-label">Formations</label>
+                <textarea asp-for="Formations" class="form-control" rows="3"></textarea>
+            </div>
+
+            <div class="form-check mb-3">
+                <input asp-for="Actif" class="form-check-input" />
+                <label asp-for="Actif" class="form-check-label">Formateur actif</label>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Annuler</a>
+            </div>
+        </form>
+    </div>
+</div>

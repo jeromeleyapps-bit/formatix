@@ -1,0 +1,115 @@
+@model FormationManager.Models.DocumentUploadViewModel
+@{
+    ViewData["Title"] = "Importer un document";
+    var indicateurs = ViewBag.Indicateurs as List<FormationManager.Models.IndicateurQualiopi> ?? new List<FormationManager.Models.IndicateurQualiopi>();
+    var indicateursGroupes = indicateurs.GroupBy(i => i.Critere).OrderBy(g => g.Key).ToList();
+    var critereLabels = new Dictionary<int, string>
+    {
+        { 1, "Information du public" },
+        { 2, "Objectifs de la prestation" },
+        { 3, "Conditions de déroulement" },
+        { 4, "Analyse du besoin" },
+        { 5, "Moyens humains et techniques" },
+        { 6, "Contenus et modalités" },
+        { 7, "Recueil des appréciations" }
+    };
+}
+
+<div class="card">
+    <div class="card-body">
+        <form asp-action="Upload" method="post" enctype="multipart/form-data" id="uploadForm">
+            @if (ViewBag.Sites != null)
+            {
+                <div class="mb-3">
+                    <label class="form-label">Site</label>
+                    <select asp-for="SiteId" class="form-select"
+                            asp-items="@(new SelectList(ViewBag.Sites, "SiteId", "Name"))">
+                    </select>
+                </div>
+            }
+            <div class="mb-3">
+                <label class="form-label">Fichier PDF</label>
+                <input asp-for="File" type="file" class="form-control" accept=".pdf" />
+                <span asp-validation-for="File" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Type de document</label>
+                <select asp-for="TypeDocument" class="form-select"
+                        asp-items="Html.GetEnumSelectList<FormationManager.Models.TypeDocument>()">
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Session (optionnel)</label>
+                <select asp-for="SessionId" id="sessionSelect" class="form-select"
+                        asp-items="@(new SelectList(ViewBag.Sessions, "Id", "Formation.Titre"))">
+                    <option value="">-- Aucune --</option>
+                </select>
+                <small class="form-text text-muted">Si une session est choisie, vous pouvez cocher les critères Qualiopi que ce document valide ci‑dessous.</small>
+            </div>
+
+            <div class="mb-4" id="qualiopiChecklistSection">
+                <label class="form-label fw-bold">Ce document valide-t-il les critères suivants ?</label>
+                <p class="small text-muted mb-2">Cochez les indicateurs que ce document prouve. Les preuves Qualiopi correspondantes seront créées à l'import (si une session est liée).</p>
+                <div class="border rounded p-3 bg-light" style="max-height: 320px; overflow-y: auto;">
+                    @foreach (var groupe in indicateursGroupes)
+                    {
+                        var label = critereLabels.ContainsKey(groupe.Key) ? critereLabels[groupe.Key] : "Autre";
+                        <div class="mb-3">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <strong class="text-primary">Critère @groupe.Key : @label</strong>
+                                <button type="button" class="btn btn-sm btn-outline-secondary toggle-critere" data-critere="@groupe.Key" title="Tout cocher / décocher">Tout</button>
+                            </div>
+                            <div class="ps-2">
+                                @foreach (var ind in groupe.OrderBy(i => int.TryParse(i.CodeIndicateur, out var n) ? n : 999))
+                                {
+                                    var lib = ind.Libelle.Length > 55 ? ind.Libelle.Substring(0, 52) + "…" : ind.Libelle;
+                                    <div class="form-check form-check-inline mb-1 me-3" style="min-width: 280px;">
+                                        <input class="form-check-input" type="checkbox" name="IndicateurIds" value="@ind.Id" id="chk_@ind.Id" />
+                                        <label class="form-check-label small" for="chk_@ind.Id">@($"[C{groupe.Key} - I{ind.CodeIndicateur}] {lib}")</label>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="mt-2 form-text" id="checklistSummary"></div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Analyser & importer</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Annuler</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+(function () {
+    var sessionSelect = document.getElementById('sessionSelect');
+    var checklists = document.querySelectorAll('input[name="IndicateurIds"]');
+    var summary = document.getElementById('checklistSummary');
+
+    function updateSummary() {
+        var n = Array.from(checklists).filter(function(c) { return c.checked; }).length;
+        summary.textContent = n === 0 ? 'Aucun critère coché.' : n + ' indicateur(s) coché(s) — ' + n + ' preuve(s) seront créée(s) si une session est liée.';
+    }
+
+    checklists.forEach(function(c) {
+        c.addEventListener('change', updateSummary);
+    });
+    updateSummary();
+
+    document.querySelectorAll('.toggle-critere').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            var critere = this.getAttribute('data-critere');
+            var zone = this.closest('.mb-3');
+            var boxes = zone.querySelectorAll('input[name="IndicateurIds"]');
+            var all = Array.from(boxes).every(function(b) { return b.checked; });
+            boxes.forEach(function(b) { b.checked = !all; });
+            updateSummary();
+        });
+    });
+})();
+</script>
+}

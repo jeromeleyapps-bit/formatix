@@ -1,0 +1,16 @@
+@model FormationManager.Models.Salle
+@{
+    ViewData["Title"] = "Supprimer la salle";
+}
+
+<div class="card">
+    <div class="card-body">
+        <p>Supprimer la salle <strong>@Model.Nom</strong> ?</p>
+        <form asp-action="Delete" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+            <button type="submit" class="btn btn-danger">Supprimer</button>
+            <a asp-action="Index" class="btn btn-outline-secondary">Annuler</a>
+        </form>
+    </div>
+</div>

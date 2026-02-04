@@ -1,0 +1,118 @@
+@model FormationManager.Models.Stagiaire
+@{
+    ViewData["Title"] = "Nouveau stagiaire";
+}
+
+<div class="card">
+    <div class="card-body">
+        <form asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+            @if (ViewBag.Sites != null)
+            {
+                <div class="mb-3">
+                    <label class="form-label">Site</label>
+                    <select asp-for="SiteId" class="form-select"
+                            asp-items="@(new SelectList(ViewBag.Sites, "SiteId", "Name"))">
+                    </select>
+                </div>
+            }
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Client / Organisation</label>
+                    <select name="ClientId" class="form-select">
+                        <option value="INDEPENDANT" selected="@(Model == null || !Model.ClientId.HasValue)">-- Indépendant (particulier) --</option>
+                        @if (ViewBag.Clients != null)
+                        {
+                            foreach (var client in (List<FormationManager.Models.Client>)ViewBag.Clients)
+                            {
+                                // Ne pas afficher "Indépendant" deux fois s'il est déjà dans la liste
+                                if (client.Nom != "Indépendant" && client.Nom != "Particulier")
+                                {
+                                    <option value="@client.Id" selected="@(Model != null && Model.ClientId == client.Id)">@client.Nom</option>
+                                }
+                            }
+                        }
+                    </select>
+                    <small class="form-text text-muted">Sélectionnez "Indépendant" pour un particulier non rattaché à une organisation</small>
+                    <span asp-validation-for="ClientId" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Session (optionnel)</label>
+                    <select name="SessionId" class="form-select">
+                        <option value="">-- Aucune --</option>
+                        @if (ViewBag.Sessions != null)
+                        {
+                            foreach (var session in (List<FormationManager.Models.Session>)ViewBag.Sessions)
+                            {
+                                var displayText = session.Formation?.Titre ?? $"Session #{session.Id}";
+                                <option value="@session.Id" selected="@(Model != null && Model.SessionId == session.Id)">@displayText</option>
+                            }
+                        }
+                    </select>
+                    <span asp-validation-for="SessionId" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Nom" class="form-label"></label>
+                    <input asp-for="Nom" class="form-control" />
+                    <span asp-validation-for="Nom" class="text-danger"></span>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Prenom" class="form-label"></label>
+                    <input asp-for="Prenom" class="form-control" />
+                    <span asp-validation-for="Prenom" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Email" class="form-label"></label>
+                    <input asp-for="Email" class="form-control" />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Telephone" class="form-label"></label>
+                    <input asp-for="Telephone" class="form-control" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Poste" class="form-label">Poste (fonction professionnelle)</label>
+                    <input asp-for="Poste" class="form-control" placeholder="Ex: Développeur, Manager, Assistant..." />
+                    <small class="form-text text-muted">Fonction ou poste occupé par le stagiaire dans son entreprise</small>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Service" class="form-label">Service / Département</label>
+                    <input asp-for="Service" class="form-control" placeholder="Ex: IT, RH, Commercial..." />
+                    <small class="form-text text-muted">Service ou département d'appartenance</small>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="DateNaissance" class="form-label">Date de naissance (optionnel)</label>
+                    <input asp-for="DateNaissance" type="date" class="form-control" />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="StatutInscription" class="form-label">Statut d'inscription</label>
+                    <select asp-for="StatutInscription" class="form-select">
+                        <option value="Inscrit">Inscrit</option>
+                        <option value="Confirmé">Confirmé</option>
+                        <option value="En cours">En cours</option>
+                        <option value="Terminé">Terminé</option>
+                        <option value="Abandonné">Abandonné</option>
+                        <option value="Annulé">Annulé</option>
+                    </select>
+                    <small class="form-text text-muted">Statut actuel de l'inscription à la formation</small>
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Annuler</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+}

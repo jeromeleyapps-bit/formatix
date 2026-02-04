@@ -1,0 +1,30 @@
+@model FormationManager.Models.Stagiaire
+@{
+    ViewData["Title"] = "Supprimer le stagiaire";
+    var returnUrl = ViewBag.ReturnUrl as string;
+}
+
+<div class="card">
+    <div class="card-body">
+        <p>Confirmer la suppression du stagiaire <strong>@Model.Nom @Model.Prenom</strong>@(Model.Session != null ? $" ({Model.Session.Formation?.Titre})" : "") ?</p>
+        <form asp-action="Delete" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@Model.Id" />
+            @if (!string.IsNullOrEmpty(returnUrl))
+            {
+                <input type="hidden" name="returnUrl" value="@returnUrl" />
+            }
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-danger">Supprimer</button>
+                @if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
+                {
+                    <a href="@returnUrl" class="btn btn-outline-secondary">Annuler</a>
+                }
+                else
+                {
+                    <a asp-action="Index" class="btn btn-outline-secondary">Annuler</a>
+                }
+            </div>
+        </form>
+    </div>
+</div>

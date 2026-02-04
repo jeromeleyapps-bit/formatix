@@ -1,0 +1,427 @@
+@{
+    ViewData["Title"] = "Ajouter une preuve";
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle"></i> @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+    </div>
+}
+
+<div class="card">
+    <div class="card-body">
+        <form asp-action="CreatePreuve" method="post" enctype="multipart/form-data" id="createPreuveForm" data-initial-document-id="@(ViewBag.DocumentId ?? "")">
+            
+            <!-- Session -->
+            <div class="mb-3">
+                <label class="form-label">📋 Session de Formation *</label>
+                <select name="sessionId" id="sessionSelect" class="form-select" required>
+                    <option value="">-- Sélectionner une session --</option>
+                    @foreach (var session in ViewBag.Sessions)
+                    {
+                        var isSelected = ViewBag.SessionId != null && ViewBag.SessionId == session.Id;
+                        <option value="@session.Id" selected="@isSelected">
+                            @(session.Formation?.Titre ?? "Formation") - @session.DateDebut.ToString("dd/MM/yyyy")
+                        </option>
+                    }
+                </select>
+            </div>
+
+            <!-- Document : nouvel import OU document déjà importé -->
+            <div class="mb-3">
+                <label class="form-label">📄 Document (optionnel)</label>
+                <div class="row g-2">
+                    <div class="col-md-6">
+                        <label class="form-label small text-muted mb-1">Importer un nouveau fichier</label>
+                        <input type="file" name="fichier" id="fileInput" class="form-control" 
+                               accept=".pdf,.jpg,.jpeg,.png" />
+                        <small class="form-text text-muted">PDF, JPEG, PNG (max 50MB)</small>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label small text-muted mb-1">Ou choisir un document déjà importé (onglet Documents)</label>
+                        <select name="documentId" id="documentSelect" class="form-select">
+                            <option value="">— Aucun, importer un nouveau —</option>
+                        </select>
+                        <small class="form-text text-muted">Sélectionnez une session puis un document lié à cette session.</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Suggestions de Critères (affichées dynamiquement) -->
+            <div id="critereSuggestions" class="mb-3" style="display: none;">
+                <label class="form-label">💡 Suggestions de Critères</label>
+                <div class="alert alert-info">
+                    <strong>Critères suggérés basés sur :</strong>
+                    <ul id="suggestionsList" class="mb-0 mt-2"></ul>
+                </div>
+            </div>
+
+            <!-- Indicateurs Qualiopi (plusieurs possibles pour un même document) -->
+            <div class="mb-3">
+                <label class="form-label">🎯 Indicateur(s) Qualiopi *</label>
+                <small class="form-text text-muted d-block mb-2">
+                    💡 <strong>Un même document peut valider plusieurs critères.</strong> Sélectionnez un ou plusieurs indicateurs (Ctrl+Clic pour en ajouter).
+                    <br>
+                    <small>Format : [C<strong>X</strong> - I<strong>Y</strong>] = Critère X → Indicateur Y. Ex. [C1 - I1] Information du public, [C6 - I26] Accessibilité handicap.</small>
+                </small>
+                <select name="indicateurIds" id="critereSelect" class="form-select" multiple size="8">
+                    <!-- options sans "vide" : multi-select -->
+                    @{
+                        var indicateursGroupes = ((List<FormationManager.Models.IndicateurQualiopi>)ViewBag.Indicateurs)
+                            .GroupBy(i => i.Critere)
+                            .OrderBy(g => g.Key);
+                        
+                        var critereLabels = new Dictionary<int, string>
+                        {
+                            { 1, "Information du public" },
+                            { 2, "Objectifs de la prestation" },
+                            { 3, "Conditions de déroulement" },
+                            { 4, "Analyse du besoin" },
+                            { 5, "Moyens humains et techniques" },
+                            { 6, "Contenus et modalités" },
+                            { 7, "Recueil des appréciations" }
+                        };
+                    }
+                    @foreach (var groupe in indicateursGroupes)
+                    {
+                        var critereLabel = critereLabels.ContainsKey(groupe.Key) 
+                            ? critereLabels[groupe.Key] 
+                            : "Autre";
+                        var countIndicateurs = groupe.Count();
+                        <optgroup label="━━━ Critère @groupe.Key : @critereLabel (@countIndicateurs indicateur@(countIndicateurs > 1 ? "s" : "")) ━━━">
+                            @foreach (var indicateur in groupe.OrderBy(i => int.TryParse(i.CodeIndicateur, out var num) ? num : 999))
+                            {
+                                var libelleCourt = indicateur.Libelle.Length > 60 
+                                    ? indicateur.Libelle.Substring(0, 57) + "..." 
+                                    : indicateur.Libelle;
+                                <option value="@indicateur.Id" 
+                                        data-critere="@indicateur.Critere"
+                                        data-description="@indicateur.Description"
+                                        data-code="@indicateur.CodeIndicateur">
+                                    @($"[C{groupe.Key} - I{indicateur.CodeIndicateur}] {libelleCourt}")
+                                </option>
+                            }
+                        </optgroup>
+                    }
+                </select>
+                <div id="indicateurCount" class="form-text text-muted mt-1" style="display: none;"></div>
+                <!-- Description du critère sélectionné (affichée uniquement si un seul indicateur sélectionné) -->
+                <div id="critereDescription" class="mt-2" style="display: none;">
+                    <div class="alert alert-light border">
+                        <strong>Description :</strong>
+                        <p id="critereDescriptionText" class="mb-0"></p>
+                    </div>
+                </div>
+
+                <!-- Aide contextuelle -->
+                <div class="mt-2">
+                    <button type="button" class="btn btn-sm btn-outline-info" 
+                            data-bs-toggle="collapse" data-bs-target="#critereHelp">
+                        ℹ️ Aide : Critères vs Indicateurs
+                    </button>
+                    <div id="critereHelp" class="collapse mt-2">
+                        <div class="card card-body bg-light">
+                            <p class="mb-2"><strong>Différence importante :</strong></p>
+                            <ul class="mb-3">
+                                <li><strong>Critère</strong> : Grand thème Qualiopi (7 critères au total : 1 à 7)</li>
+                                <li><strong>Indicateur</strong> : Point précis à prouver (plusieurs indicateurs par critère)</li>
+                            </ul>
+                            <p class="mb-2"><strong>Exemple :</strong></p>
+                            <ul class="mb-0">
+                                <li><strong>Critère 1</strong> - Information du public :
+                                    <ul>
+                                        <li>Indicateur 1.1 - Information sur les prérequis</li>
+                                        <li>Indicateur 1.2 - Information sur les objectifs</li>
+                                        <li>Indicateur 1.3 - Information sur les modalités</li>
+                                    </ul>
+                                </li>
+                            </ul>
+                            <p class="mt-3 mb-0"><strong>💡 Conseil :</strong> Choisissez l'indicateur le plus précis qui correspond à votre document.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Titre -->
+            <div class="mb-3">
+                <label class="form-label">📝 Titre de la Preuve *</label>
+                <input name="titre" id="titreInput" class="form-control" required />
+                <small class="form-text text-muted">
+                    Auto-complété depuis le nom du fichier si un document est uploadé
+                </small>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-3">
+                <label class="form-label">📄 Description (optionnel)</label>
+                <textarea name="description" class="form-control" rows="3"></textarea>
+            </div>
+
+            <!-- Type de preuve -->
+            <div class="mb-3">
+                <label class="form-label">Type de preuve</label>
+                <select name="typePreuve" class="form-select"
+                        asp-items="Html.GetEnumSelectList<FormationManager.Models.PreuveQualiopi.TypePreuve>()">
+                </select>
+            </div>
+
+            <!-- Boutons -->
+            <div class="d-flex gap-2">
+                <button type="submit" id="submitPreuve" class="btn btn-primary">✅ Créer la(les) Preuve(s)</button>
+                <a asp-action="Preuves" class="btn btn-outline-secondary">❌ Annuler</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// JavaScript pour le guidage intelligent
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('createPreuveForm');
+    const sessionSelect = document.getElementById('sessionSelect');
+    const fileInput = document.getElementById('fileInput');
+    const documentSelect = document.getElementById('documentSelect');
+    const critereSelect = document.getElementById('critereSelect');
+    const titreInput = document.getElementById('titreInput');
+    const suggestionsDiv = document.getElementById('critereSuggestions');
+    const suggestionsList = document.getElementById('suggestionsList');
+    const critereDescription = document.getElementById('critereDescription');
+    const critereDescriptionText = document.getElementById('critereDescriptionText');
+    const indicateurCount = document.getElementById('indicateurCount');
+    const submitPreuve = document.getElementById('submitPreuve');
+    const initialDocumentId = (form && form.getAttribute('data-initial-document-id')) || '';
+
+    // Charger les documents déjà importés pour la session sélectionnée
+    async function fetchDocuments(sessionId) {
+        const select = documentSelect;
+        select.innerHTML = '<option value="">— Aucun, importer un nouveau —</option>';
+        select.disabled = !sessionId;
+        if (!sessionId) return;
+        try {
+            const res = await fetch('/QualiopiUi/GetDocumentsBySession?sessionId=' + encodeURIComponent(sessionId));
+            const docs = await res.json();
+            docs.forEach(function(d) {
+                const opt = document.createElement('option');
+                opt.value = d.id;
+                opt.setAttribute('data-nom', d.nomFichier || '');
+                opt.textContent = (d.nomFichier || 'Document #' + d.id) + ' (' + (d.typeDocument || '') + ')';
+                select.appendChild(opt);
+            });
+            if (initialDocumentId && docs.some(function(d) { return String(d.id) === String(initialDocumentId); })) {
+                select.value = initialDocumentId;
+                fileInput.value = '';
+                const opt = select.options[select.selectedIndex];
+                if (opt && opt.value && !titreInput.value) {
+                    titreInput.value = (opt.getAttribute('data-nom') || '').replace(/\.[^/.]+$/, '');
+                }
+                loadSuggestions();
+            }
+        } catch (e) {
+            console.error('Erreur chargement documents:', e);
+        }
+    }
+
+    sessionSelect.addEventListener('change', function() {
+        fetchDocuments(this.value);
+        documentSelect.value = '';
+        loadSuggestions();
+    });
+
+    documentSelect.addEventListener('change', function() {
+        if (this.value) {
+            fileInput.value = '';
+            const opt = this.options[this.selectedIndex];
+            const nom = opt ? opt.getAttribute('data-nom') || '' : '';
+            if (nom && !titreInput.value) {
+                titreInput.value = nom.replace(/\.[^/.]+$/, '');
+            }
+        }
+        loadSuggestions();
+    });
+
+    fileInput.addEventListener('change', function() {
+        if (this.files.length > 0) {
+            documentSelect.value = '';
+            const nameWithoutExt = (this.files[0].name || '').replace(/\.[^/.]+$/, '');
+            if (!titreInput.value) titreInput.value = nameWithoutExt;
+        }
+        loadSuggestions();
+    });
+
+    if (sessionSelect.value) fetchDocuments(sessionSelect.value);
+
+    function updateIndicateurSelectionUI() {
+        const sel = Array.from(critereSelect.selectedOptions);
+        const n = sel.length;
+        if (n === 0) {
+            indicateurCount.style.display = 'none';
+            critereDescription.style.display = 'none';
+            return;
+        }
+        indicateurCount.style.display = 'block';
+        indicateurCount.textContent = n === 1
+            ? '1 indicateur sélectionné'
+            : n + ' indicateurs sélectionnés — ce document validera ces ' + n + ' critères.';
+        if (n === 1) {
+            const desc = sel[0].getAttribute('data-description');
+            if (desc) {
+                critereDescriptionText.textContent = desc;
+                critereDescription.style.display = 'block';
+            } else {
+                critereDescription.style.display = 'none';
+            }
+        } else {
+            critereDescription.style.display = 'none';
+        }
+    }
+
+    critereSelect.addEventListener('change', updateIndicateurSelectionUI);
+
+    form.addEventListener('submit', function(ev) {
+        const n = critereSelect.selectedOptions.length;
+        if (n === 0) {
+            ev.preventDefault();
+            alert('Sélectionnez au moins un indicateur Qualiopi.');
+            critereSelect.focus();
+            return;
+        }
+    });
+
+    // Fonction pour charger les suggestions
+    async function loadSuggestions() {
+        const sessionId = sessionSelect.value;
+        let fileName = fileInput.files.length > 0 ? fileInput.files[0].name : null;
+        if (!fileName && documentSelect.value) {
+            const opt = documentSelect.options[documentSelect.selectedIndex];
+            if (opt) fileName = opt.getAttribute('data-nom') || null;
+        }
+
+        if (!sessionId && !fileName) {
+            suggestionsDiv.style.display = 'none';
+            return;
+        }
+
+        try {
+            const url = `/QualiopiUi/GetCritereSuggestions?sessionId=${sessionId || ''}&fileName=${encodeURIComponent(fileName || '')}`;
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+                console.error('Erreur lors du chargement des suggestions');
+                return;
+            }
+            
+            const suggestions = await response.json();
+
+            if (suggestions && suggestions.length > 0) {
+                suggestionsList.innerHTML = '';
+                suggestions.forEach(suggestion => {
+                    // Trouver tous les indicateurs pour ce critère
+                    const critereOptions = Array.from(critereSelect.options)
+                        .filter(opt => opt.getAttribute('data-critere') == suggestion.critere && opt.value);
+                    
+                    if (critereOptions.length > 0) {
+                        const li = document.createElement('li');
+                        const badgeClass = suggestion.isMissing ? 'bg-warning' : 'bg-info';
+                        const confidencePercent = Math.round(suggestion.confidence * 100);
+                        
+                        // Si plusieurs indicateurs pour ce critère, afficher le premier et mentionner les autres
+                        const firstOption = critereOptions[0];
+                        const codeIndicateur = firstOption.getAttribute('data-code') || '';
+                        const libelle = firstOption.textContent.trim();
+                        const countText = critereOptions.length > 1 
+                            ? ` (${critereOptions.length} indicateur(s) disponibles)` 
+                            : '';
+                        
+                        // Construire la liste des indicateurs disponibles (format [Cx-Iy]), dédupliquée par code
+                        const codeSet = new Set();
+                        const codesUnique = [];
+                        critereOptions.forEach(opt => {
+                            const c = opt.getAttribute('data-critere') || suggestion.critere;
+                            const i = opt.getAttribute('data-code') || '';
+                            const code = `[C${c}-I${i}]`;
+                            if (!codeSet.has(code)) {
+                                codeSet.add(code);
+                                codesUnique.push(code);
+                            }
+                        });
+                        let indicateursList = '';
+                        if (codesUnique.length > 1) {
+                            indicateursList = '<br><small class="text-muted">📋 Indicateurs disponibles : ' + 
+                                codesUnique.join(', ') + '</small>';
+                        }
+                        
+                        const selectLabel = `[C${suggestion.critere} - I${codeIndicateur}]`;
+                        li.innerHTML = `
+                            <div class="mb-2">
+                                <strong>Critère ${suggestion.critere}</strong> 
+                                <span class="badge ${badgeClass}">${confidencePercent}%</span>
+                                ${suggestion.isMissing ? '<span class="badge bg-danger ms-1">&#9888; Manquant</span>' : ''}
+                                <br>
+                                <small class="text-muted">${suggestion.reason}</small>
+                                <br>
+                                <small class="text-muted">&#128161; Indicateur suggéré : <strong>${libelle}</strong></small>
+                                ${indicateursList}
+                            </div>
+                            <div>
+                                <button type="button" class="btn btn-sm btn-outline-primary" 
+                                        onclick="addIndicateur(${firstOption.value})">
+                                    Ajouter ${selectLabel}
+                                </button>
+                                ${codesUnique.length > 1 ? `<button type="button" class="btn btn-sm btn-outline-secondary ms-1" onclick="addCritereGroupe(${suggestion.critere})">Ajouter tout le critère (${codesUnique.length})</button>` : ''}
+                                ${codesUnique.length > 1 ? `<button type="button" class="btn btn-sm btn-outline-info ms-1" onclick="showAllIndicateurs(${suggestion.critere})">Voir la liste</button>` : ''}
+                            </div>
+                        `;
+                        suggestionsList.appendChild(li);
+                    }
+                });
+                suggestionsDiv.style.display = 'block';
+            } else {
+                suggestionsDiv.style.display = 'none';
+            }
+        } catch (error) {
+            console.error('Erreur lors du chargement des suggestions:', error);
+            suggestionsDiv.style.display = 'none';
+        }
+    }
+
+    // Ajouter un indicateur à la sélection (multi-select)
+    window.addIndicateur = function(indicateurId) {
+        const opt = Array.from(critereSelect.options).find(o => o.value === String(indicateurId));
+        if (opt) {
+            opt.selected = true;
+            critereSelect.dispatchEvent(new Event('change'));
+            critereSelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    };
+
+    // Ajouter tous les indicateurs d'un critère à la sélection
+    window.addCritereGroupe = function(critere) {
+        const optgroups = Array.from(critereSelect.querySelectorAll('optgroup'));
+        const targetGroup = optgroups.find(og => og.label.includes('Critère ' + critere));
+        if (targetGroup) {
+            Array.from(targetGroup.querySelectorAll('option')).forEach(o => { o.selected = true; });
+            critereSelect.dispatchEvent(new Event('change'));
+            critereSelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    };
+
+    window.showAllIndicateurs = function(critere) {
+        const optgroups = Array.from(critereSelect.querySelectorAll('optgroup'));
+        const targetGroup = optgroups.find(og => og.label.includes('Critère ' + critere));
+        if (targetGroup) {
+            const indicateurs = Array.from(targetGroup.options).map(opt => {
+                const c = opt.getAttribute('data-critere') || critere;
+                const i = opt.getAttribute('data-code') || '';
+                let lib = opt.textContent.trim();
+                const prefix = `[C${c} - I${i}] `;
+                if (lib.startsWith(prefix)) lib = lib.slice(prefix.length);
+                return '• [C' + c + '-I' + i + '] ' + lib;
+            }).join('\n');
+            alert('Critère ' + critere + ' : ' + targetGroup.options.length + ' indicateur(s)\n\n' + indicateurs + '\n\nUtilisez "Ajouter [Cx-Iy]" ou "Ajouter tout le critère" pour les sélectionner.');
+        }
+    };
+
+    updateIndicateurSelectionUI();
+});
+</script>

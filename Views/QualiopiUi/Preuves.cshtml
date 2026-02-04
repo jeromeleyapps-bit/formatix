@@ -1,0 +1,102 @@
+@model IEnumerable<FormationManager.Models.PreuveQualiopi>
+@{
+    ViewData["Title"] = "Preuves Qualiopi";
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle"></i> @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle"></i> @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+    </div>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Preuves Qualiopi</h2>
+    <div class="d-flex gap-2">
+        <form asp-action="RapportConformite" method="get" class="d-flex gap-2">
+            <select name="sessionId" class="form-select form-select-sm"
+                    asp-items="@(new SelectList(ViewBag.Sessions, "Id", "Formation.Titre"))">
+            </select>
+            <button type="submit" class="btn btn-outline-primary btn-sm">
+                <i class="fas fa-file-pdf"></i> Rapport
+            </button>
+        </form>
+        <form asp-action="ExportJson" method="get" class="d-flex gap-2">
+            <select name="sessionId" class="form-select form-select-sm"
+                    asp-items="@(new SelectList(ViewBag.Sessions, "Id", "Formation.Titre"))">
+            </select>
+            <button type="submit" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-file-code"></i> Export JSON
+            </button>
+        </form>
+        <a asp-action="CreatePreuve" class="btn btn-primary btn-sm">
+            <i class="fas fa-plus"></i> Ajouter une preuve
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="table-responsive">
+        <table class="table table-striped mb-0">
+            <thead class="table-light">
+                <tr>
+                    @if (ViewBag.ShowSite == true)
+                    {
+                        <th>Site</th>
+                    }
+                    <th>Indicateur</th>
+                    <th>Session</th>
+                    <th>Titre</th>
+                    <th>Type</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var preuve in Model)
+                {
+                    <tr>
+                        @if (ViewBag.ShowSite == true)
+                        {
+                            var siteNames = ViewBag.SiteNames as Dictionary<string, string>;
+                            var siteLabel = siteNames != null && siteNames.ContainsKey(preuve.SiteId)
+                                ? siteNames[preuve.SiteId]
+                                : preuve.SiteId;
+                            <td>@siteLabel</td>
+                        }
+                        <td>@preuve.Indicateur?.CodeIndicateur</td>
+                        <td>@preuve.Session?.Formation?.Titre</td>
+                        <td>@preuve.Titre</td>
+                        <td>@preuve.Type</td>
+                        <td>@(preuve.EstValide ? "Validé" : "En attente")</td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                @if (!string.IsNullOrWhiteSpace(preuve.CheminFichier))
+                                {
+                                    <a href="@preuve.CheminFichier" class="btn btn-outline-secondary btn-sm" target="_blank">
+                                        <i class="fas fa-file"></i>
+                                    </a>
+                                }
+                                <form asp-action="ValiderPreuve" method="post" class="d-flex gap-1">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@preuve.Id" />
+                                    <input type="text" name="commentaire" class="form-control form-control-sm" placeholder="Commentaire" />
+                                    <button type="submit" class="btn btn-outline-success btn-sm">
+                                        <i class="fas fa-check"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

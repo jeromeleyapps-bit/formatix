@@ -1,0 +1,211 @@
+@using Microsoft.AspNetCore.Identity
+@using FormationManager.Models
+@inject SignInManager<Utilisateur> SignInManager
+@inject UserManager<Utilisateur> UserManager
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    @inject FormationManager.Services.IOrganizationService OrganizationService
+    <title>@ViewData["Title"] - @OrganizationService.GetApplicationName() - @OrganizationService.GetOrganizationName()</title>
+    <link rel="icon" type="image/png" href="/icon.png" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/opagax-custom.css" asp-append-version="true" />
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background-color: #343a40;
+        }
+        /* Sidebar styles améliorés par opagax-custom.css */
+        .sidebar .brand-subtitle {
+            color: #cfd4da;
+        }
+        .main-content {
+            min-height: 100vh;
+            background-color: #f8f9fa;
+        }
+        .card {
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            border: none;
+        }
+        .stats-card {
+            border-left: 4px solid #007bff;
+        }
+        .stats-card.success {
+            border-left-color: #28a745;
+        }
+        .stats-card.warning {
+            border-left-color: #ffc107;
+        }
+        .stats-card.danger {
+            border-left-color: #dc3545;
+        }
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #007bff;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    @if (SignInManager.IsSignedIn(User))
+    {
+        var currentUser = await UserManager.GetUserAsync(User);
+        var isAdmin = currentUser?.Role == RoleUtilisateur.Administrateur;
+        <div class="container-fluid">
+            <div class="row g-0">
+                <!-- Sidebar -->
+                <nav class="col-12 col-md-3 col-lg-2 sidebar">
+                    <div class="position-sticky pt-3">
+                        <div class="text-center mb-4">
+                            <h4 class="text-white">@OrganizationService.GetApplicationName()</h4>
+                            <small class="brand-subtitle">@OrganizationService.GetOrganizationName()</small>
+                        </div>
+                        
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")" 
+                                   asp-controller="Home" asp-action="Index">
+                                    <i class="fas fa-tachometer-alt me-2"></i> Tableau de bord
+                                </a>
+                            </li>
+                            @if (isAdmin)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Admin" ? "active" : "")"
+                                       asp-controller="Admin" asp-action="Dashboard">
+                                        <i class="fas fa-chart-line me-2"></i> Dashboard admin
+                                    </a>
+                                </li>
+                            }
+                            <li class="nav-item">
+                                <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Formations" ? "active" : "")" 
+                                   asp-controller="Formations" asp-action="Index">
+                                    <i class="fas fa-graduation-cap me-2"></i> Formations
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Formateurs" ? "active" : "")" 
+                                   asp-controller="Formateurs" asp-action="Index">
+                                    <i class="fas fa-chalkboard-teacher me-2"></i> Formateurs
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Salles" ? "active" : "")"
+                                   asp-controller="Salles" asp-action="Index">
+                                    <i class="fas fa-door-open me-2"></i> Salles
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Sessions" ? "active" : "")" 
+                                   asp-controller="Sessions" asp-action="Index">
+                                    <i class="fas fa-calendar-alt me-2"></i> Sessions
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Agenda" ? "active" : "")"
+                                   asp-controller="Agenda" asp-action="Index">
+                                    <i class="fas fa-calendar-week me-2"></i> Agenda
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Clients" ? "active" : "")"
+                                   asp-controller="Clients" asp-action="Index">
+                                    <i class="fas fa-users me-2"></i> Clients
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Stagiaires" ? "active" : "")"
+                                   asp-controller="Stagiaires" asp-action="Index">
+                                    <i class="fas fa-user-graduate me-2"></i> Stagiaires
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Documents" ? "active" : "")"
+                                   asp-controller="Documents" asp-action="Index">
+                                    <i class="fas fa-file-alt me-2"></i> Documents
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "QualiopiUi" ? "active" : "")"
+                                   asp-controller="QualiopiUi" asp-action="Index">
+                                    <i class="fas fa-certificate me-2"></i> Qualiopi
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Veille" ? "active" : "")"
+                                   asp-controller="Veille" asp-action="Index">
+                                    <i class="fas fa-rss me-2"></i> Veille
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Bpf" ? "active" : "")"
+                                   asp-controller="Bpf" asp-action="Index">
+                                    <i class="fas fa-chart-bar me-2"></i> BPF
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Facturation" ? "active" : "")"
+                                   asp-controller="Facturation" asp-action="Index">
+                                    <i class="fas fa-file-invoice-dollar me-2"></i> Facturation
+                                </a>
+                            </li>
+                        </ul>
+
+                        <hr class="text-muted">
+
+                        <ul class="nav flex-column">
+                            <li class="nav-item">
+                                <a class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Settings" ? "active" : "")"
+                                   asp-controller="Settings" asp-action="Index">
+                                    <i class="fas fa-cog me-2"></i> Paramètres
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Logout">
+                                    <i class="fas fa-sign-out-alt me-2"></i> Déconnexion
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+
+                <!-- Main content -->
+                <main class="col-12 col-md-9 col-lg-10 px-md-4 main-content">
+                    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                        <h1 class="h2">@ViewData["Title"]</h1>
+                    </div>
+
+                    @RenderBody()
+                </main>
+            </div>
+        </div>
+    }
+    else
+    {
+        @RenderBody()
+    }
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script src="~/js/opagax.js" asp-append-version="true"></script>
+    
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3" id="toastContainer"></div>
+    
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

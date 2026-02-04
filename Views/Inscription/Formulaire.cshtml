@@ -1,0 +1,57 @@
+@{
+    ViewData["Title"] = "Inscription en ligne";
+    Layout = "_LoginLayout";
+    var session = ViewBag.Session as FormationManager.Models.Session;
+    var placesRestantes = ViewBag.PlacesRestantes as int? ?? 0;
+    var nom = ViewBag.Nom as string ?? "";
+    var prenom = ViewBag.Prenom as string ?? "";
+    var email = ViewBag.Email as string ?? "";
+    var telephone = ViewBag.Telephone as string ?? "";
+    var poste = ViewBag.Poste as string ?? "";
+    var erreur = ViewBag.Erreur as string;
+}
+
+@if (session != null)
+{
+    <div class="mb-4">
+        <h5 class="mb-2">@session.Formation?.Titre</h5>
+        <p class="mb-1 text-muted"><strong>Dates :</strong> @session.DateDebut.ToString("dd/MM/yyyy") - @session.DateFin.ToString("dd/MM/yyyy")</p>
+        <p class="mb-1 text-muted"><strong>Lieu :</strong> @session.Lieu</p>
+        <p class="mb-0 text-muted"><strong>Places restantes :</strong> @placesRestantes</p>
+    </div>
+
+    @if (!string.IsNullOrEmpty(erreur))
+    {
+        <div class="alert alert-danger">@erreur</div>
+    }
+
+    <form asp-action="Inscription" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="sessionId" value="@session.Id" />
+
+        <div class="mb-3">
+            <label class="form-label">Nom *</label>
+            <input type="text" name="nom" class="form-control" value="@nom" required />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Prénom *</label>
+            <input type="text" name="prenom" class="form-control" value="@prenom" required />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input type="email" name="email" class="form-control" value="@email" />
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Téléphone</label>
+            <input type="text" name="telephone" class="form-control" value="@telephone" />
+        </div>
+        <div class="mb-4">
+            <label class="form-label">Poste (optionnel)</label>
+            <input type="text" name="poste" class="form-control" value="@poste" />
+        </div>
+
+        <div class="d-grid">
+            <button type="submit" class="btn btn-primary btn-lg">S'inscrire</button>
+        </div>
+    </form>
+}

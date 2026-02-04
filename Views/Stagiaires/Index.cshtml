@@ -1,0 +1,117 @@
+@model IEnumerable<FormationManager.Models.StagiaireGroupedViewModel>
+@{
+    ViewData["Title"] = "Stagiaires";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Stagiaires</h2>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Nouveau stagiaire
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h6 class="m-0 font-weight-bold text-primary">Liste des stagiaires</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    @if (ViewBag.ShowSite == true)
+                    {
+                        <th>Site</th>
+                    }
+                    <th>Nom</th>
+                    <th>Client</th>
+                    <th>Formation</th>
+                    <th>Session</th>
+                    <th>Email</th>
+                    <th>Téléphone</th>
+                    <th>Documents</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var groupe in Model)
+                {
+                    var stagiaire = groupe.StagiairePrincipal;
+                    var nombreSessions = groupe.NombreFormations;
+                    var sessions = groupe.ToutesLesSessions.ToList();
+                    var premiereSession = sessions.FirstOrDefault();
+                    
+                    <tr>
+                        @if (ViewBag.ShowSite == true)
+                        {
+                            var siteNames = ViewBag.SiteNames as Dictionary<string, string>;
+                            var siteLabel = siteNames != null && siteNames.ContainsKey(stagiaire.SiteId)
+                                ? siteNames[stagiaire.SiteId]
+                                : stagiaire.SiteId;
+                            <td rowspan="@nombreSessions">@siteLabel</td>
+                        }
+                        <td rowspan="@nombreSessions">
+                            <strong>@stagiaire.Nom @stagiaire.Prenom</strong>
+                            @if (nombreSessions > 1)
+                            {
+                                <br /><small class="text-muted">(@nombreSessions formation@(nombreSessions > 1 ? "s" : ""))</small>
+                            }
+                        </td>
+                        <td rowspan="@nombreSessions">@stagiaire.Client?.Nom</td>
+                        <td>@premiereSession?.Session?.Formation?.Titre</td>
+                        <td>@premiereSession?.Session?.DateDebut.ToString("dd/MM/yyyy")</td>
+                        <td rowspan="@nombreSessions">@stagiaire.Email</td>
+                        <td rowspan="@nombreSessions">@stagiaire.Telephone</td>
+                        <td rowspan="@nombreSessions">
+                            <div class="d-flex flex-column gap-2">
+                                @foreach (var s in sessions)
+                                {
+                                    if (s.Session != null)
+                                    {
+                                        var documentsExistants = ViewBag.DocumentsExistants as Dictionary<string, FormationManager.Models.Document>;
+                                        var keyAttestation = $"{s.Id}_{s.SessionId}_{FormationManager.Models.TypeDocument.Attestation}";
+                                        var keyEvaluation = $"{s.Id}_{s.SessionId}_{FormationManager.Models.TypeDocument.Evaluation}";
+                                        var hasAttestation = documentsExistants != null && documentsExistants.ContainsKey(keyAttestation);
+                                        var hasEvaluation = documentsExistants != null && documentsExistants.ContainsKey(keyEvaluation);
+                                        
+                                        <div class="border rounded p-2 mb-2" style="min-width: 200px;">
+                                            <small class="d-block fw-bold mb-1">@s.Session.Formation?.Titre</small>
+                                            <div class="d-flex gap-1 align-items-center">
+                                                <a asp-action="GenerateAttestation" asp-route-id="@s.Id"
+                                                   class="btn btn-outline-@(hasAttestation ? "success" : "secondary") btn-sm" 
+                                                   title="Attestation - @s.Session.Formation?.Titre">
+                                                    <i class="fas fa-file-pdf"></i> @(hasAttestation ? "✓" : "")
+                                                </a>
+                                                <a asp-action="GenerateEvaluation" asp-route-id="@s.Id"
+                                                   class="btn btn-outline-@(hasEvaluation ? "success" : "secondary") btn-sm" 
+                                                   title="Évaluation - @s.Session.Formation?.Titre">
+                                                    <i class="fas fa-clipboard-check"></i> @(hasEvaluation ? "✓" : "")
+                                                </a>
+                                            </div>
+                                            @if (hasAttestation || hasEvaluation)
+                                            {
+                                                <small class="text-success d-block mt-1">
+                                                    <i class="fas fa-check-circle"></i> Document(s) généré(s)
+                                                </small>
+                                            }
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                    @if (sessions.Count > 1)
+                    {
+                        @foreach (var sessionStagiaire in sessions.Skip(1))
+                        {
+                            <tr>
+                                <td>@sessionStagiaire.Session?.Formation?.Titre</td>
+                                <td>@sessionStagiaire.Session?.DateDebut.ToString("dd/MM/yyyy")</td>
+                            </tr>
+                        }
+                    }
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

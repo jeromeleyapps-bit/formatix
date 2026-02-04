@@ -1,0 +1,401 @@
+@model FormationManager.Models.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard Admin";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4>Dashboard Administrateur</h4>
+    <button type="button" class="btn btn-primary btn-sm" onclick="location.reload()">
+        <i class="bi bi-arrow-clockwise"></i> Actualiser
+    </button>
+</div>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Erreur:</strong> @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="row mb-4">
+    <div class="col-md-2">
+        <div class="card stats-card">
+            <div class="card-body">
+                <small class="text-muted">Formations</small>
+                <div class="h4">@Model.TotalFormations</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card stats-card">
+            <div class="card-body">
+                <small class="text-muted">Sessions</small>
+                <div class="h4">@Model.TotalSessions</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card stats-card">
+            <div class="card-body">
+                <small class="text-muted">Stagiaires</small>
+                <div class="h4">@Model.TotalStagiaires</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card stats-card">
+            <div class="card-body">
+                <small class="text-muted">Documents</small>
+                <div class="h4">@Model.TotalDocuments</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card stats-card">
+            <div class="card-body">
+                <small class="text-muted">Preuves</small>
+                <div class="h4">@Model.TotalPreuves</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card stats-card warning">
+            <div class="card-body">
+                <small class="text-muted">Sessions sans docs</small>
+                <div class="h4">@Model.SessionsMissingDocuments</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card stats-card warning">
+            <div class="card-body">
+                <small class="text-muted">Sessions sans preuves</small>
+                <div class="h4">@Model.SessionsMissingPreuves</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card border-primary">
+            <div class="card-body d-flex flex-wrap align-items-center justify-content-between gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="text-primary fs-4"><i class="fas fa-rss"></i></span>
+                    <div>
+                        <h6 class="mb-1 fw-bold">Veille critère 6</h6>
+                        <small class="text-muted">Flux RSS, actualités et validations (indicateurs 23–29)</small>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-4">
+                    <div class="text-center">
+                        <div class="h5 mb-0">@Model.VeilleFluxCount</div>
+                        <small class="text-muted">flux</small>
+                    </div>
+                    <div class="text-center">
+                        <div class="h5 mb-0">@Model.VeilleActualitesCount</div>
+                        <small class="text-muted">actualités</small>
+                    </div>
+                    <div class="text-center">
+                        <div class="h5 mb-0">@Model.VeilleValidationsCount</div>
+                        <small class="text-muted">validations</small>
+                    </div>
+                </div>
+                <a asp-controller="Veille" asp-action="Index" class="btn btn-primary">
+                    <i class="fas fa-external-link-alt me-1"></i> Voir la veille
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-lg-6 mb-3">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">Synthèse Qualiopi (tous sites)</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-3">
+                    <div>
+                        <div class="h4 mb-0 text-success">@Model.QualiopiTauxGlobal%</div>
+                        <small class="text-muted">Taux global d'indicateurs couverts</small>
+                    </div>
+                    <div>
+                        <div class="h5 mb-0">@Model.QualiopiIndicateursValides / @Model.QualiopiTotalIndicateurs</div>
+                        <small class="text-muted">Indicateurs avec au moins une preuve / veille</small>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead>
+                        <tr>
+                            <th>Critère</th>
+                            <th>Indicateurs</th>
+                            <th>Validés</th>
+                            <th>Taux</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var c in Model.QualiopiCriteres)
+                        {
+                            var ratio = c.TotalIndicateurs == 0 ? 0 : (decimal)c.IndicateursValides / c.TotalIndicateurs;
+                            var badgeClass = ratio >= 0.8m ? "bg-success" : (ratio >= 0.5m ? "bg-warning text-dark" : "bg-danger");
+                            <tr>
+                                <td>Critère @c.Critere</td>
+                                <td>@c.TotalIndicateurs</td>
+                                <td>@c.IndicateursValides</td>
+                                <td>
+                                    <span class="badge @badgeClass">@c.TauxValidite%</span>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 mb-3">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">Sessions à risque Qualiopi</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Session / Formation</th>
+                            <th>Site</th>
+                            <th>Docs</th>
+                            <th>Preuves</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @if (Model.SessionsAtRisk.Any())
+                        {
+                            foreach (var s in Model.SessionsAtRisk)
+                            {
+                                <tr>
+                                    <td>@s.DateDebut.ToString("dd/MM/yyyy")</td>
+                                    <td>
+                                        <a asp-controller="Sessions" asp-action="Details" asp-route-id="@s.SessionId">
+                                            @s.FormationTitre
+                                        </a>
+                                    </td>
+                                    <td>@s.SiteName (@s.SiteId)</td>
+                                    <td>
+                                        <span class="badge @(s.MissingDocuments ? "bg-danger" : "bg-success")">
+                                            @(s.MissingDocuments ? "Manquants" : "OK")
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge @(s.MissingPreuves ? "bg-danger" : "bg-success")">
+                                            @(s.MissingPreuves ? "Manquantes" : "OK")
+                                        </span>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">Aucune session à risque détectée.</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h6 class="m-0 font-weight-bold text-primary">Avancement par site</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>Site</th>
+                    <th>Formations</th>
+                    <th>Sessions</th>
+                    <th>Stagiaires</th>
+                    <th>Documents</th>
+                    <th>Preuves Qualiopi</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var site in Model.Sites)
+                {
+                    <tr>
+                        <td>@site.SiteName (@site.SiteId)</td>
+                        <td>@site.Formations</td>
+                        <td>@site.Sessions</td>
+                        <td>@site.Stagiaires</td>
+                        <td>@site.Documents</td>
+                        <td>@site.Preuves</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header">
+        <h6 class="m-0 font-weight-bold text-primary">Avancement par formateur</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>Formateur</th>
+                    <th>Site</th>
+                    <th>Sessions</th>
+                    <th>Stagiaires</th>
+                    <th>Documents</th>
+                    <th>Preuves</th>
+                    <th>Sessions sans docs</th>
+                    <th>Sessions sans preuves</th>
+                    <th>Dernière session</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var trainer in Model.Trainers)
+                {
+                    <tr>
+                        <td>@trainer.Prenom @trainer.Nom</td>
+                        <td>@trainer.SiteName</td>
+                        <td>@trainer.Sessions</td>
+                        <td>@trainer.Stagiaires</td>
+                        <td>@trainer.Documents</td>
+                        <td>@trainer.Preuves</td>
+                        <td>@trainer.SessionsMissingDocuments</td>
+                        <td>@trainer.SessionsMissingPreuves</td>
+                        <td>@(trainer.DerniereSession?.ToString("dd/MM/yyyy") ?? "-")</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header">
+        <h6 class="m-0 font-weight-bold text-primary">Relances évaluations par formation</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>Formation</th>
+                    <th>Site</th>
+                    <th>Sessions</th>
+                    <th>Sessions sans évaluation</th>
+                    <th>Stagiaires sans évaluation</th>
+                    <th>Dernière session</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var formation in Model.FormationsFollowup)
+                {
+                    <tr>
+                        <td>@formation.Titre</td>
+                        <td>@formation.SiteName</td>
+                        <td>@formation.Sessions</td>
+                        <td>
+                            <span class="badge @(formation.SessionsWithoutEvaluationDocs > 0 ? "bg-warning text-dark" : "bg-success")">
+                                @formation.SessionsWithoutEvaluationDocs
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge @(formation.StagiairesWithoutEvaluation > 0 ? "bg-danger" : "bg-success")">
+                                @formation.StagiairesWithoutEvaluation
+                            </span>
+                        </td>
+                        <td>@(formation.DerniereSession?.ToString("dd/MM/yyyy") ?? "-")</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">Documents en attente (@Model.PendingDocumentsCount)</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Session</th>
+                            <th>Site</th>
+                            <th>Date</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var doc in Model.PendingDocuments)
+                        {
+                            <tr>
+                                <td>@doc.TypeDocument</td>
+                                <td>@doc.SessionTitle</td>
+                                <td>@doc.SiteName</td>
+                                <td>@doc.DateCreation.ToString("dd/MM/yyyy")</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">Preuves en attente (@Model.PendingPreuvesCount)</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                        <tr>
+                            <th>Indicateur</th>
+                            <th>Session</th>
+                            <th>Site</th>
+                            <th>Date</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var preuve in Model.PendingPreuves)
+                        {
+                            <tr>
+                                <td>@preuve.Indicateur</td>
+                                <td>@preuve.SessionTitle</td>
+                                <td>@preuve.SiteName</td>
+                                <td>@preuve.DateCreation.ToString("dd/MM/yyyy")</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

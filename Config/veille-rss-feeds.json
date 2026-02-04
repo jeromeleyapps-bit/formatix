@@ -1,0 +1,65 @@
+{
+  "veilleRssFeeds": [
+    {
+      "name": "Service-public Pro",
+      "url": "https://www.service-public.fr/abonnements/rss/actu-actu-pro.rss",
+      "defaultIndicateurCode": "23",
+      "comment": "Veille légale et réglementaire (pros)"
+    },
+    {
+      "name": "Service-public Particuliers",
+      "url": "https://www.service-public.fr/abonnements/rss/actu-actualites-particuliers.rss",
+      "defaultIndicateurCode": "23",
+      "comment": "Actualités droits particuliers"
+    },
+    {
+      "name": "data.gouv.fr – Datasets récents",
+      "url": "https://www.data.gouv.fr/fr/datasets/recent.atom",
+      "defaultIndicateurCode": "23",
+      "comment": "Nouveaux jeux de données (Atom)"
+    },
+    {
+      "name": "Centre Inffo – Le Quotidien de la formation",
+      "url": "https://www.centre-inffo.fr/category/site-centre-inffo/actualites-centre-inffo/le-quotidien-de-la-formation-actualite-formation-professionnelle-apprentissage/feed",
+      "defaultIndicateurCode": "24",
+      "comment": "Formation pro, apprentissage. Référent sectoriel."
+    },
+    {
+      "name": "Centre Inffo – Droit",
+      "url": "https://www.centre-inffo.fr/category/site-droit-formation/actualites-droit/feed",
+      "defaultIndicateurCode": "23",
+      "comment": "Veille juridique formation"
+    },
+    {
+      "name": "Centre Inffo – Réforme",
+      "url": "https://www.centre-inffo.fr/category/site-reforme/feed",
+      "defaultIndicateurCode": "23",
+      "comment": "Réformes formation, réglementation"
+    },
+    {
+      "name": "Centre Inffo – Innovation",
+      "url": "https://www.centre-inffo.fr/category/innovation-formation/feed",
+      "defaultIndicateurCode": "25",
+      "comment": "Innovation pédagogique et technologique"
+    },
+    {
+      "name": "Centre Inffo – Régions",
+      "url": "https://www.centre-inffo.fr/category/actualites-regions/feed",
+      "defaultIndicateurCode": "24",
+      "comment": "Actualités régionales emploi, formation, insertion"
+    },
+    {
+      "name": "Mon Activité Formation (MAF)",
+      "url": "https://info.monactiviteformation.emploi.gouv.fr/actualites/rss/",
+      "defaultIndicateurCode": "23",
+      "comment": "Déclarations d’activité, Qualiopi, BPF, France Compétences. Pro OF."
+    },
+    {
+      "name": "L’Atelier du formateur",
+      "url": "https://latelierduformateur.fr/feed",
+      "defaultIndicateurCode": "25",
+      "comment": "Digital learning, IA, pédagogie. Blog formateurs."
+    }
+  ],
+  "_comment": "France Travail : recrute.francetravail.org/offre-de-emploi/tous-les-flux-rss.aspx. Centre Inffo : autres flux (Europe, Vidéos, etc.) sur centre-inffo.fr/centre-inffo/nos-flux-rss. BO et DARES : générer les URLs puis ajouter."
+}

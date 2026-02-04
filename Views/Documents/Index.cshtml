@@ -1,0 +1,210 @@
+@model FormationManager.Models.DocumentsIndexViewModel
+@{
+    ViewData["Title"] = "Documents";
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle"></i> @Html.Raw(TempData["Success"])
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle"></i> @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<h2 class="mb-4">Documents</h2>
+
+<!-- 1. Documents importés (preuves) – usage principal -->
+<div class="card mb-4">
+    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+            <h6 class="m-0 fw-bold text-primary">Documents importés (preuves)</h6>
+            <small class="text-muted">Documents uploadés pour les sessions, à lier aux preuves Qualiopi.</small>
+        </div>
+        <a asp-action="Upload" class="btn btn-primary">
+            <i class="fas fa-upload"></i> Importer un document (preuve)
+        </a>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover mb-0">
+                <thead>
+                <tr>
+                    @if (ViewBag.ShowSite == true)
+                    {
+                        <th>Site</th>
+                    }
+                    <th>Type</th>
+                    <th>Fichier</th>
+                    <th>Statut</th>
+                    <th>Session</th>
+                    <th>Client</th>
+                    <th>Stagiaire</th>
+                    <th>Créé le</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var doc in Model.Documents)
+                {
+                    <tr>
+                        @if (ViewBag.ShowSite == true)
+                        {
+                            var siteNames = ViewBag.SiteNames as Dictionary<string, string>;
+                            var siteLabel = siteNames != null && siteNames.ContainsKey(doc.SiteId)
+                                ? siteNames[doc.SiteId]
+                                : doc.SiteId;
+                            <td>@siteLabel</td>
+                        }
+                        <td>@doc.TypeDocument</td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(doc.NomFichier))
+                            {
+                                <a href="@doc.CheminFichier" target="_blank" class="text-decoration-none">
+                                    <i class="fas fa-file-pdf"></i> @doc.NomFichier
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </td>
+                        <td>
+                            <span class="badge bg-@(doc.StatutValidation == "Validé" ? "success" : doc.StatutValidation == "Rejeté" ? "danger" : "warning")">
+                                @doc.StatutValidation
+                            </span>
+                        </td>
+                        <td>
+                            @if (doc.SessionId.HasValue)
+                            {
+                                <span class="badge bg-success" title="Lié à une session">
+                                    <i class="fas fa-link"></i> @doc.Session?.Formation?.Titre
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning text-dark" title="Non lié à une session">
+                                    <i class="fas fa-unlink"></i> Non lié
+                                </span>
+                            }
+                        </td>
+                        <td>@doc.Client?.Nom</td>
+                        <td>@doc.Stagiaire?.Nom @doc.Stagiaire?.Prenom</td>
+                        <td>@doc.DateCreation.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                @if (!string.IsNullOrEmpty(doc.CheminFichier))
+                                {
+                                    <a href="@doc.CheminFichier" target="_blank" class="btn btn-outline-primary btn-sm" title="Télécharger">
+                                        <i class="fas fa-download"></i>
+                                    </a>
+                                }
+                                @if (doc.SessionId == null)
+                                {
+                                    <a asp-action="LinkSession" asp-route-id="@doc.Id" class="btn btn-outline-warning btn-sm" title="Lier à une session">
+                                        <i class="fas fa-link"></i>
+                                    </a>
+                                }
+                                @if (doc.SessionId.HasValue)
+                                {
+                                    <a asp-controller="QualiopiUi" asp-action="CreatePreuve" asp-route-sessionId="@doc.SessionId" asp-route-documentId="@doc.Id" class="btn btn-outline-success btn-sm" title="Créer une preuve Qualiopi">
+                                        <i class="fas fa-certificate"></i>
+                                    </a>
+                                }
+                                <form asp-action="Delete" asp-route-id="@doc.Id" method="post" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce document ? Cette action est irréversible.');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-outline-danger btn-sm" title="Supprimer">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+        @if (!Model.Documents.Any())
+        {
+            <p class="text-muted mb-0 mt-3">Aucun document importé. Utilisez « Importer un document (preuve) » pour ajouter des documents (PDF, etc.) à lier à une session puis aux preuves Qualiopi.</p>
+        }
+    </div>
+</div>
+
+<p class="mb-2">
+    <a href="#document-types" class="small text-secondary text-decoration-none">
+        <i class="fas fa-arrow-down"></i> Documents types (modèles)
+    </a>
+</p>
+
+<!-- 2. Documents types (modèles) – ressources formateurs / coordinateurs -->
+<div class="card border-secondary" id="document-types">
+    <div class="card-header bg-light">
+        <h6 class="m-0 fw-bold">Documents types (modèles)</h6>
+        <small class="text-muted">Modèles et exemples partagés (convocations, émargements, etc.), accessibles à tous les formateurs et coordinateurs du site.</small>
+    </div>
+    <div class="card-body">
+        <form asp-action="UploadExample" method="post" enctype="multipart/form-data" class="row g-3 align-items-end">
+            @Html.AntiForgeryToken()
+            <div class="col-md-5">
+                <label class="form-label small mb-1">Nouveau modèle</label>
+                <input type="file" name="exampleFile" class="form-control" accept=".pdf,.docx,.xlsx,.xls,.pptx" />
+                <small class="text-muted">PDF, DOCX, XLSX, XLS, PPTX</small>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-outline-secondary">
+                    <i class="fas fa-plus-circle"></i> Ajouter un document type
+                </button>
+            </div>
+        </form>
+        <div class="table-responsive mt-3">
+            <table class="table table-bordered mb-0">
+                <thead>
+                <tr>
+                    <th>Fichier</th>
+                    <th>Taille</th>
+                    <th>Modifié</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var example in Model.Examples)
+                {
+                    <tr>
+                        <td><i class="fas fa-file-alt text-muted me-1"></i>@example.FileName</td>
+                        <td>@example.SizeKb KB</td>
+                        <td>@example.LastModified.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>
+                            <a href="@example.Url" class="btn btn-outline-secondary btn-sm" target="_blank" title="Télécharger">
+                                <i class="fas fa-download"></i> Télécharger
+                            </a>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+        @if (!Model.Examples.Any())
+        {
+            <p class="text-muted mb-0 mt-3">Aucun document type. Ajoutez des modèles (convocation, feuille d’émargement, etc.) pour les mettre à disposition des formateurs et coordinateurs.</p>
+        }
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    (function () {
+        var hash = window.location.hash;
+        if (hash === '#document-types') {
+            document.getElementById('document-types')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    })();
+</script>
+}

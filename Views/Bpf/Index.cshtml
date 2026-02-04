@@ -1,0 +1,35 @@
+@{
+    ViewData["Title"] = "BPF";
+    var dateFin = DateTime.Today;
+    var dateDebut = dateFin.AddYears(-1);
+}
+
+<div class="card">
+    <div class="card-header">
+        <h6 class="m-0 font-weight-bold text-primary">Bilan Pédagogique et Financier</h6>
+    </div>
+    <div class="card-body">
+        <p>Générez un BPF pour la période souhaitée.</p>
+
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <label class="form-label">Date de début</label>
+                <input type="date" name="debut" class="form-control" value="@dateDebut.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Date de fin</label>
+                <input type="date" name="fin" class="form-control" value="@dateFin.ToString("yyyy-MM-dd")" />
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100" asp-action="Download">
+                    <i class="fas fa-file-pdf me-2"></i>Télécharger le BPF
+                </button>
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-outline-secondary w-100" asp-action="DownloadJson">
+                    <i class="fas fa-file-code me-2"></i>Exporter JSON
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

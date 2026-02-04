@@ -1,0 +1,294 @@
+@model FormationManager.Models.Formation
+@{
+    ViewData["Title"] = "Détails Formation";
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="mb-0">@Model.Titre</h4>
+                <div class="btn-group">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+                        <i class="fas fa-edit"></i> Modifier
+                    </a>
+                    <a asp-action="Create" asp-controller="Sessions" asp-route-formationId="@Model.Id" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Programmer une session
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Durée :</strong> @Model.DureeHeures heures
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Prix indicatif :</strong> @(Model.PrixIndicatif.ToString("N2")) €
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <strong>Description :</strong>
+                    <p>@Model.Description</p>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.Programme))
+                {
+                    <div class="mb-3">
+                        <strong>Programme :</strong>
+                        <div class="border rounded p-3 bg-light">
+                            @Html.Raw(Model.Programme.Replace("\n", "<br/>"))
+                        </div>
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.Prerequis))
+                {
+                    <div class="mb-3">
+                        <strong>Prérequis :</strong>
+                        <p>@Model.Prerequis</p>
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.ModalitesPedagogiques))
+                {
+                    <div class="mb-3">
+                        <strong>Modalités pédagogiques :</strong>
+                        <p>@Model.ModalitesPedagogiques</p>
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(Model.ModalitesEvaluation))
+                {
+                    <div class="mb-3">
+                        <strong>Modalités d'évaluation :</strong>
+                        <p>@Model.ModalitesEvaluation</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">Informations</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-2">
+                    <small class="text-muted">Créée le</small>
+                    <div>@Model.DateCreation.ToString("dd/MM/yyyy")</div>
+                </div>
+                <div class="mb-2">
+                    <small class="text-muted">Modifiée le</small>
+                    <div>@Model.DateModification.ToString("dd/MM/yyyy")</div>
+                </div>
+                <div class="mb-2">
+                    <small class="text-muted">Visibilité</small>
+                    <div>
+                        @if (Model.EstPublique)
+                        {
+                            <span class="badge bg-success">Publique</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Privée</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5 class="mb-0">Actions rapides</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a asp-action="Create" asp-controller="Sessions" asp-route-formationId="@Model.Id" class="btn btn-success">
+                        <i class="fas fa-calendar-plus"></i> Programmer une session
+                    </a>
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+                        <i class="fas fa-edit"></i> Modifier
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">
+                        <i class="fas fa-trash"></i> Supprimer
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Upload Document Audit -->
+<div class="modal fade" id="uploadDocumentModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Ajouter un document d'audit Qualiopi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form asp-controller="FormationsAudit" asp-action="UploadDocumentAudit" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="formationId" value="@Model.Id" />
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nom du document *</label>
+                        <input type="text" name="nom" class="form-control" required 
+                               placeholder="Ex: Programme de formation v2.1" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Type de document *</label>
+                        <select name="typeDocument" class="form-select" required>
+                            <option value="">-- Sélectionner --</option>
+                            <option value="Fiche descriptive">Fiche descriptive</option>
+                            <option value="Programme">Programme de formation</option>
+                            <option value="Référentiel">Référentiel de formation</option>
+                            <option value="Analyse besoins">Analyse des besoins</option>
+                            <option value="Objectifs">Objectifs pédagogiques</option>
+                            <option value="Modalités pédagogiques">Modalités pédagogiques</option>
+                            <option value="Modalités évaluation">Modalités d'évaluation</option>
+                            <option value="Convention">Convention de formation</option>
+                            <option value="Planning">Planning de formation</option>
+                            <option value="Émargement">Feuille d'émargement</option>
+                            <option value="Attestation">Attestation de présence</option>
+                            <option value="Évaluation">Évaluation de fin de formation</option>
+                            <option value="CV formateur">CV formateur</option>
+                            <option value="Fiche de poste">Fiche de poste</option>
+                            <option value="Questionnaire">Questionnaire de satisfaction</option>
+                            <option value="Réclamation">Registre des réclamations</option>
+                            <option value="Plan amélioration">Plan d'amélioration continue</option>
+                            <option value="Autre">Autre</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Critères Qualiopi concernés</label>
+                        <input type="text" name="critereQualiopi" class="form-control" 
+                               placeholder="Ex: 1,2,3 ou 1-3" />
+                        <small class="form-text text-muted">Indiquez les critères Qualiopi couverts par ce document</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea name="description" class="form-control" rows="3" 
+                                  placeholder="Description du document..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Fichier *</label>
+                        <input type="file" name="file" class="form-control" required accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png" />
+                        <small class="form-text text-muted">Formats acceptés : PDF, Word, Excel, Images</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modals pour afficher les versions -->
+@if (ViewBag.Versions != null)
+{
+    @foreach (var version in (List<FormationManager.Models.FormationVersion>)ViewBag.Versions)
+    {
+        <div class="modal fade" id="versionModal@version.Id" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Version @version.NumeroVersion - @version.DateVersion.ToString("dd/MM/yyyy HH:mm")</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p><strong>Raison de modification :</strong> @version.RaisonModification</p>
+                        <p><strong>Modifié par :</strong> @version.ModifiePar</p>
+                        <hr />
+                        <h6>Contenu de cette version :</h6>
+                        <div class="mb-2"><strong>Titre :</strong> @version.Titre</div>
+                        <div class="mb-2"><strong>Description :</strong> @version.Description</div>
+                        @if (!string.IsNullOrEmpty(version.Programme))
+                        {
+                            <div class="mb-2">
+                                <strong>Programme :</strong>
+                                <div class="border rounded p-2 bg-light">@Html.Raw(version.Programme.Replace("\n", "<br/>"))</div>
+                            </div>
+                        }
+                        @if (!string.IsNullOrEmpty(version.Prerequis))
+                        {
+                            <div class="mb-2"><strong>Prérequis :</strong> @version.Prerequis</div>
+                        }
+                        @if (!string.IsNullOrEmpty(version.ModalitesPedagogiques))
+                        {
+                            <div class="mb-2"><strong>Modalités pédagogiques :</strong> @version.ModalitesPedagogiques</div>
+                        }
+                        @if (!string.IsNullOrEmpty(version.ModalitesEvaluation))
+                        {
+                            <div class="mb-2"><strong>Modalités d'évaluation :</strong> @version.ModalitesEvaluation</div>
+                        }
+                        <div class="mb-2"><strong>Durée :</strong> @version.DureeHeures heures</div>
+                        <div class="mb-2"><strong>Prix :</strong> @(version.PrixIndicatif.ToString("N2")) €</div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+@if (Model.Sessions != null && Model.Sessions.Any())
+{
+    <div class="mt-4">
+        <h4>Sessions programmées</h4>
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Date début</th>
+                        <th>Date fin</th>
+                        <th>Lieu</th>
+                        <th>Formateur</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var session in Model.Sessions.OrderByDescending(s => s.DateDebut))
+                    {
+                        <tr>
+                            <td>@session.DateDebut.ToString("dd/MM/yyyy")</td>
+                            <td>@session.DateFin.ToString("dd/MM/yyyy")</td>
+                            <td>@session.Lieu</td>
+                            <td>@(session.Formateur != null ? $"{session.Formateur.Prenom} {session.Formateur.Nom}" : "-")</td>
+                            <td>
+                                <span class="badge @(GetStatusBadgeClass(session.Statut))">
+                                    @session.Statut
+                                </span>
+                            </td>
+                            <td>
+                                <a asp-action="Details" asp-controller="Sessions" asp-route-id="@session.Id" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+@{
+    string GetStatusBadgeClass(string status)
+    {
+        return status switch
+        {
+            "Programmée" => "bg-info",
+            "En cours" => "bg-success",
+            "Terminée" => "bg-secondary",
+            "Annulée" => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+}

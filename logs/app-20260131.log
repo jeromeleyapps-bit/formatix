@@ -1,0 +1,2 @@
+[2026-01-31 19:49:39.245 +01:00 INF] HTTP GET / responded 302 in 6.9871 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJ03FNLUMC6:00000001","ConnectionId":"0HNJ03FNLUMC6","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":28}
+[2026-01-31 19:49:39.353 +01:00 INF] HTTP GET /Account/Login responded 200 in 94.7054 ms {"SourceContext":"Serilog.AspNetCore.RequestLoggingMiddleware","RequestId":"0HNJ03FNLUMC6:00000002","ConnectionId":"0HNJ03FNLUMC6","EnvironmentName":"Production","MachineName":"PC_JEY","ThreadId":28}

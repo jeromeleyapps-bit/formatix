@@ -1,0 +1,618 @@
+@model FormationManager.Models.SettingsViewModel
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment WebHostEnvironment
+@{
+    ViewData["Title"] = "Paramètres";
+    var siteNames = ViewBag.SiteNames as Dictionary<string, string> ?? new Dictionary<string, string>();
+    var logoPath = System.IO.Path.Combine(WebHostEnvironment.WebRootPath, "uploads", "logo.png");
+    var logoPathJpg = System.IO.Path.Combine(WebHostEnvironment.WebRootPath, "uploads", "logo.jpg");
+    var hasLogo = System.IO.File.Exists(logoPath) || System.IO.File.Exists(logoPathJpg);
+    var logoUrl = hasLogo ? "/uploads/logo.png" : (System.IO.File.Exists(logoPathJpg) ? "/uploads/logo.jpg" : "/icon.png");
+    var diagnosticsModel = ViewBag.DiagnosticsModel as FormationManager.Models.SystemDiagnosticsViewModel;
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<!-- Navigation par onglets -->
+<ul class="nav nav-tabs mb-4" id="settingsTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="general-tab" data-bs-toggle="tab" data-bs-target="#general" type="button" role="tab" aria-controls="general" aria-selected="true">
+            <i class="fas fa-cog me-2"></i> Général
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="diagnostics-tab" data-bs-toggle="tab" data-bs-target="#diagnostics" type="button" role="tab" aria-controls="diagnostics" aria-selected="false">
+            <i class="fas fa-tools me-2"></i> Diagnostic système
+        </button>
+    </li>
+</ul>
+
+<!-- Contenu des onglets -->
+<div class="tab-content" id="settingsTabContent">
+    <!-- Onglet Général -->
+    <div class="tab-pane fade show active" id="general" role="tabpanel" aria-labelledby="general-tab">
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h6 class="m-0 font-weight-bold text-primary">Sites</h6>
+    </div>
+    <div class="card-body">
+        <form asp-action="AddSite" method="post" class="row g-2 mb-3">
+            @Html.AntiForgeryToken()
+            <div class="col-md-3">
+                <input name="siteId" class="form-control" placeholder="SiteId (ex: SITE_06)" />
+            </div>
+            <div class="col-md-4">
+                <input name="name" class="form-control" placeholder="Nom du site" />
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-outline-primary w-100">
+                    <i class="fas fa-plus"></i> Ajouter un site
+                </button>
+            </div>
+            <div class="col-md-2">
+                <a asp-action="ExportSites" class="btn btn-outline-secondary w-100">
+                    <i class="fas fa-file-export"></i> Export CSV
+                </a>
+            </div>
+        </form>
+        <div class="table-responsive">
+            <table class="table table-sm">
+                <thead>
+                <tr>
+                    <th>SiteId</th>
+                    <th>Nom</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var site in Model.Sites)
+                {
+                    <tr>
+                        <td>@site.SiteId</td>
+                        <td>
+                            <form asp-action="RenameSite" method="post" class="d-flex gap-2">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="siteId" value="@site.SiteId" />
+                                <input name="name" class="form-control form-control-sm" value="@site.Name" />
+                                <button class="btn btn-sm btn-outline-secondary" type="submit">
+                                    Renommer
+                                </button>
+                            </form>
+                        </td>
+                        <td>@(site.IsActive ? "Actif" : "Inactif")</td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <form asp-action="ToggleSite" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="siteId" value="@site.SiteId" />
+                                    <button class="btn btn-sm btn-outline-warning" type="submit">
+                                        @(site.IsActive ? "Désactiver" : "Réactiver")
+                                    </button>
+                                </form>
+                                <form asp-action="DeleteSite" method="post" class="d-flex gap-1">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="siteId" value="@site.SiteId" />
+                                    <select name="transferToSiteId" class="form-select form-select-sm" style="min-width: 150px;">
+                                        <option value="">-- Transfert (si données) --</option>
+                                        @foreach (var target in Model.Sites.Where(s => s.SiteId != site.SiteId))
+                                        {
+                                            <option value="@target.SiteId">@target.Name</option>
+                                        }
+                                    </select>
+                                    <button class="btn btn-sm btn-outline-danger" type="submit" 
+                                            onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce site ?' + (@Model.Sites.Count > 1 ? ' Si le site contient des données, elles seront transférées vers le site sélectionné.' : ''))">
+                                        Supprimer
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h6 class="m-0 font-weight-bold text-primary">Utilisateurs</h6>
+    </div>
+    <div class="card-body">
+        <form asp-action="CreateUser" method="post" class="row g-2 mb-3">
+            @Html.AntiForgeryToken()
+            <div class="col-md-3">
+                <input name="Email" class="form-control" placeholder="Email" />
+            </div>
+            <div class="col-md-2">
+                <input name="Nom" class="form-control" placeholder="Nom" />
+            </div>
+            <div class="col-md-2">
+                <input name="Prenom" class="form-control" placeholder="Prénom" />
+            </div>
+            <div class="col-md-2">
+                <select name="Role" class="form-select">
+                    <option value="@FormationManager.Models.RoleUtilisateur.Administrateur">Administrateur</option>
+                    <option value="@FormationManager.Models.RoleUtilisateur.ResponsableSite">Responsable de site</option>
+                    <option value="@FormationManager.Models.RoleUtilisateur.ResponsableFormation">Responsable formation</option>
+                </select>
+                <small class="text-muted d-block mt-1">
+                    <i class="fas fa-info-circle"></i> Pour créer un formateur, utilisez l'onglet <a href="/Formateurs/Create" class="alert-link">Formateurs</a> dans le menu
+                </small>
+            </div>
+            <div class="col-md-2">
+                <select name="SiteId" class="form-select" id="newUserSiteId">
+                    <option value="">-- Site (optionnel pour admin) --</option>
+                    @foreach (var site in Model.Sites)
+                    {
+                        <option value="@site.SiteId">@site.Name</option>
+                    }
+                </select>
+                <small class="text-muted">Non requis pour Administrateur</small>
+            </div>
+            <div class="col-md-2">
+                <input name="Password" type="password" class="form-control" placeholder="Mot de passe" required minlength="8" />
+                <small class="text-muted">Min 8 car., 1 majuscule, 1 minuscule, 1 chiffre</small>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-outline-primary w-100">Créer</button>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-sm">
+                <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Email</th>
+                    <th>Rôle</th>
+                    <th>Site</th>
+                    <th>Actif</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var user in Model.Users)
+                {
+                    var siteLabel = siteNames.ContainsKey(user.SiteId) ? siteNames[user.SiteId] : user.SiteId;
+                    <tr>
+                        <td>@user.Prenom @user.Nom</td>
+                        <td>@user.Email</td>
+                        <td>@user.Role</td>
+                        <td>@(string.IsNullOrWhiteSpace(siteLabel) ? "-" : siteLabel)</td>
+                        <td>@(user.Actif ? "Oui" : "Non")</td>
+                        <td>
+                            <div class="d-flex flex-column gap-2">
+                                <form asp-action="UpdateUser" method="post" class="d-flex gap-2">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@user.Id" />
+                                    <select name="role" class="form-select form-select-sm">
+                                        <option value="@FormationManager.Models.RoleUtilisateur.Administrateur" selected="@(user.Role == FormationManager.Models.RoleUtilisateur.Administrateur)">Administrateur</option>
+                                        <option value="@FormationManager.Models.RoleUtilisateur.ResponsableSite" selected="@(user.Role == FormationManager.Models.RoleUtilisateur.ResponsableSite)">Responsable de site</option>
+                                        <option value="@FormationManager.Models.RoleUtilisateur.Formateur" selected="@(user.Role == FormationManager.Models.RoleUtilisateur.Formateur)">Formateur</option>
+                                        <option value="@FormationManager.Models.RoleUtilisateur.ResponsableFormation" selected="@(user.Role == FormationManager.Models.RoleUtilisateur.ResponsableFormation)">Responsable formation</option>
+                                    </select>
+                                    <select name="siteId" class="form-select form-select-sm">
+                                        <option value="">-- Site --</option>
+                                        @foreach (var site in Model.Sites)
+                                        {
+                                            <option value="@site.SiteId" selected="@(user.SiteId == site.SiteId)">@site.Name</option>
+                                        }
+                                    </select>
+                                    <select name="actif" class="form-select form-select-sm">
+                                        <option value="true" selected="@user.Actif">Actif</option>
+                                        <option value="false" selected="@(user.Actif == false)">Inactif</option>
+                                    </select>
+                                    <button class="btn btn-sm btn-outline-secondary" type="submit">Mettre à jour</button>
+                                </form>
+                                <form asp-action="ResetUserPassword" method="post" class="d-flex gap-2">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@user.Id" />
+                                    <input name="newPassword" type="password" class="form-control form-control-sm" placeholder="Nouveau mot de passe" />
+                                    <button class="btn btn-sm btn-outline-danger" type="submit">Reset MDP</button>
+                                </form>
+                                <form asp-action="DeleteUser" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@user.Id" />
+                                    <button class="btn btn-sm btn-outline-danger" type="submit">Supprimer</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h6 class="m-0 font-weight-bold text-primary">Paramètres techniques</h6>
+    </div>
+    <div class="card-body">
+        <form asp-action="UpdateSyncSettings" method="post" class="row g-2 mb-3">
+            @Html.AntiForgeryToken()
+            <div class="col-md-3">
+                <label class="form-label">Site courant</label>
+                <select name="siteId" class="form-select">
+                    @foreach (var site in Model.Sites)
+                    {
+                        <option value="@site.SiteId" selected="@(site.SiteId == Model.CurrentSiteId)">@site.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-5">
+                <label class="form-label">Serveur central</label>
+                <input name="centralUrl" class="form-control" value="@Model.CentralUrl" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Intervalle (min)</label>
+                <input name="intervalMinutes" type="number" min="1" class="form-control" value="@Model.SyncIntervalMinutes" />
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-outline-primary w-100">Enregistrer</button>
+            </div>
+        </form>
+        <a asp-controller="Account" asp-action="Logout" class="btn btn-outline-secondary">
+            <i class="fas fa-sign-out-alt"></i> Déconnexion
+        </a>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header">
+        <h6 class="m-0 font-weight-bold text-primary">Paramètres de l'organisme</h6>
+    </div>
+    <div class="card-body">
+        <form asp-action="UpdateOrganizationSettings" method="post" class="row g-2">
+            @Html.AntiForgeryToken()
+            <div class="col-12">
+                <label class="form-label">URL publique (inscription en ligne)</label>
+                <input name="BaseUrlInscription" class="form-control font-monospace" placeholder="Ex. https://xxx.trycloudflare.com (vide = localhost)" value="@Model.Organization.BaseUrlInscription" />
+                <small class="form-text text-muted">Lien et QR code pointent vers cette URL. À renseigner si vous utilisez un tunnel (Cloudflare, ngrok…) ou un domaine en production. Voir SOLUTIONS_ACCES_DISTANCE_INSCRIPTION.md.</small>
+            </div>
+            <div class="col-md-4">
+                <input name="NomOrganisme" class="form-control" placeholder="Nom organisme" value="@Model.Organization.NomOrganisme" />
+            </div>
+            <div class="col-md-4">
+                <input name="SIRET" class="form-control" placeholder="SIRET" value="@Model.Organization.SIRET" />
+            </div>
+            <div class="col-md-4">
+                <input name="Email" class="form-control" placeholder="Email" value="@Model.Organization.Email" />
+            </div>
+            <div class="col-md-4">
+                <input name="Telephone" class="form-control" placeholder="Téléphone" value="@Model.Organization.Telephone" />
+            </div>
+            <div class="col-md-4">
+                <input name="Adresse" class="form-control" placeholder="Adresse" value="@Model.Organization.Adresse" />
+            </div>
+            <div class="col-md-2">
+                <input name="CodePostal" class="form-control" placeholder="Code postal" value="@Model.Organization.CodePostal" />
+            </div>
+            <div class="col-md-2">
+                <input name="Ville" class="form-control" placeholder="Ville" value="@Model.Organization.Ville" />
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-outline-primary w-100" type="submit">Enregistrer</button>
+            </div>
+        </form>
+        
+        <!-- Section Logo -->
+        <div class="mt-4 pt-4 border-top">
+            <h6 class="mb-3">Logo de l'organisme</h6>
+            <p class="text-muted small mb-3">Le logo sera utilisé dans l'interface et sur tous les PDF générés (catalogue, BPF, évaluations). Formats acceptés : PNG, JPG (max 5MB).</p>
+            
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    @if (hasLogo)
+                    {
+                        <div class="mb-3">
+                            <img src="@logoUrl" alt="Logo" class="img-thumbnail" style="max-height: 150px; max-width: 100%;" />
+                            <p class="small text-muted mt-2">Logo actuel</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="mb-3 p-3 border rounded bg-light text-center">
+                            <i class="fas fa-image fa-3x text-muted mb-2"></i>
+                            <p class="small text-muted mb-0">Aucun logo uploadé</p>
+                        </div>
+                    }
+                </div>
+                <div class="col-md-8">
+                    <form asp-action="UploadLogo" method="post" enctype="multipart/form-data" class="mb-3">
+                        @Html.AntiForgeryToken()
+                        <div class="input-group">
+                            <input type="file" name="logoFile" class="form-control" accept=".png,.jpg,.jpeg" required />
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-upload"></i> Uploader
+                            </button>
+                        </div>
+                        <small class="form-text text-muted">PNG ou JPG, max 5MB</small>
+                    </form>
+                    @if (hasLogo)
+                    {
+                        <form asp-action="DeleteLogo" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer le logo ?');">
+                                <i class="fas fa-trash"></i> Supprimer le logo
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header">
+        <h6 class="m-0 font-weight-bold text-primary">Paramètres Qualiopi</h6>
+    </div>
+    <div class="card-body">
+        <form asp-action="UpdateQualiopiSettings" method="post" class="row g-2">
+            @Html.AntiForgeryToken()
+            <div class="col-md-2">
+                <label class="form-label">Certification</label>
+                <select name="Certification" class="form-select">
+                    <option value="true" selected="@(Model.Qualiopi.Certification)">Oui</option>
+                    <option value="false" selected="@(Model.Qualiopi.Certification == false)">Non</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Numéro</label>
+                <input name="NumeroCertification" class="form-control" value="@Model.Qualiopi.NumeroCertification" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Date certif</label>
+                <input name="DateCertification" class="form-control" value="@Model.Qualiopi.DateCertification" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Prochaine éval</label>
+                <input name="DateProchaineEvaluation" class="form-control" value="@Model.Qualiopi.DateProchaineEvaluation" />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Organisme</label>
+                <input name="OrganismeCertificateur" class="form-control" value="@Model.Qualiopi.OrganismeCertificateur" />
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-outline-primary w-100" type="submit">Enregistrer</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+    </div>
+    
+    <!-- Onglet Diagnostic système -->
+    <div class="tab-pane fade" id="diagnostics" role="tabpanel" aria-labelledby="diagnostics-tab">
+        @if (diagnosticsModel != null)
+        {
+            @if (diagnosticsModel.HasWarnings)
+            {
+                <div class="alert alert-warning">
+                    <h6 class="fw-bold mb-2"><i class="fas fa-exclamation-triangle me-1"></i> Points à surveiller</h6>
+                    <ul class="mb-0">
+                        @foreach (var w in diagnosticsModel.Warnings)
+                        {
+                            <li>@w</li>
+                        }
+                    </ul>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle me-1"></i> Aucun problème majeur détecté. La configuration semble correcte.
+                </div>
+            }
+
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h6 class="m-0 fw-bold">Base de données</h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-1">
+                        <strong>Connexion :</strong>
+                        @if (diagnosticsModel.DatabaseCanConnect)
+                        {
+                            <span class="badge bg-success">OK</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Échec</span>
+                            <span class="text-muted ms-2">@diagnosticsModel.DatabaseError</span>
+                        }
+                    </p>
+                    <p class="mb-1"><strong>Fichier SQLite :</strong> <code>@diagnosticsModel.DatabasePath</code></p>
+                    <p class="mb-0">
+                        <strong>Statut du fichier :</strong>
+                        @if (diagnosticsModel.DatabaseFileExists)
+                        {
+                            <span class="badge bg-success">Présent</span>
+                            if (diagnosticsModel.DatabaseFileSizeBytes.HasValue)
+                            {
+                                var sizeMb = diagnosticsModel.DatabaseFileSizeBytes.Value / (1024d * 1024d);
+                                <span class="text-muted ms-2">(@sizeMb.ToString("F1") Mo)</span>
+                            }
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Introuvable</span>
+                        }
+                    </p>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h6 class="m-0 fw-bold">Fichiers et espace disque</h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-1"><strong>Racine application :</strong> <code>@diagnosticsModel.ContentRootPath</code></p>
+                    <p class="mb-2">
+                        <strong>Espace disque libre (approx.) :</strong>
+                        @if (diagnosticsModel.ContentRootFreeSpaceBytes.HasValue)
+                        {
+                            var freeGb = diagnosticsModel.ContentRootFreeSpaceBytes.Value / (1024d * 1024d * 1024d);
+                            <span>@freeGb.ToString("F1") Go libres</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Non déterminé</span>
+                        }
+                    </p>
+                    <div class="row">
+                        <div class="col-md-4 mb-2">
+                            <div><strong>Dossier uploads</strong></div>
+                            <div><code>@diagnosticsModel.UploadsPath</code></div>
+                            <div>
+                                @if (diagnosticsModel.UploadsFolderOk)
+                                {
+                                    <span class="badge bg-success">Accessible</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Inaccessible</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <div><strong>Dossier exemples</strong></div>
+                            <div><code>@diagnosticsModel.ExamplesPath</code></div>
+                            <div>
+                                @if (diagnosticsModel.ExamplesFolderOk)
+                                {
+                                    <span class="badge bg-success">Accessible</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Inaccessible</span>
+                                }
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-2">
+                            <div><strong>Dossier generated</strong></div>
+                            <div><code>@diagnosticsModel.GeneratedPath</code></div>
+                            <div>
+                                @if (diagnosticsModel.GeneratedFolderOk)
+                                {
+                                    <span class="badge bg-success">Accessible</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">Inaccessible</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h6 class="m-0 fw-bold">Inscriptions à distance</h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-1">
+                        <strong>BaseUrlInscription :</strong>
+                        @if (diagnosticsModel.BaseUrlInscriptionConfigured)
+                        {
+                            <code>@diagnosticsModel.BaseUrlInscription</code>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Non configuré (l'application utilisera l'URL courante du serveur)</span>
+                        }
+                    </p>
+                    <p class="mb-0">
+                        <strong>URL publique valide :</strong>
+                        @if (diagnosticsModel.BaseUrlInscriptionConfigured && diagnosticsModel.BaseUrlInscriptionLooksPublic)
+                        {
+                            <span class="badge bg-success">Oui</span>
+                        }
+                        else if (diagnosticsModel.BaseUrlInscriptionConfigured)
+                        {
+                            <span class="badge bg-warning text-dark">À vérifier</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Par défaut</span>
+                        }
+                    </p>
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h6 class="m-0 fw-bold">Multi-sites / Sync</h6>
+                </div>
+                <div class="card-body">
+                    <p class="mb-1">
+                        <strong>Sync:SiteId :</strong>
+                        @if (diagnosticsModel.SyncSiteIdDefined)
+                        {
+                            <code>@diagnosticsModel.SyncSiteId</code>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Non défini</span>
+                        }
+                    </p>
+                    <p class="mb-0">
+                        <strong>Référencé dans la liste des sites :</strong>
+                        @if (diagnosticsModel.SyncSiteIdDefined && diagnosticsModel.SyncSiteIdKnownInSites)
+                        {
+                            <span class="badge bg-success">Oui</span>
+                        }
+                        else if (diagnosticsModel.SyncSiteIdDefined)
+                        {
+                            <span class="badge bg-warning text-dark">Non (à vérifier)</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Non applicable</span>
+                        }
+                    </p>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-1"></i> Impossible de charger les informations de diagnostic.
+            </div>
+        }
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const roleSelect = document.querySelector('form[asp-action="CreateUser"] select[name="Role"]');
+    const siteSelect = document.getElementById('newUserSiteId');
+    
+    if (roleSelect && siteSelect) {
+        function updateSiteField() {
+            // Administrateur = valeur 2 dans l'enum (Formateur=0, ResponsableFormation=1, Administrateur=2, ResponsableSite=3)
+            const selectedOption = roleSelect.options[roleSelect.selectedIndex];
+            const isAdmin = roleSelect.value === '2' || selectedOption.textContent.trim() === 'Administrateur';
+            siteSelect.disabled = isAdmin;
+            if (isAdmin) {
+                siteSelect.value = '';
+            }
+        }
+        
+        roleSelect.addEventListener('change', updateSiteField);
+        updateSiteField(); // Initial state
+    }
+});
+</script>

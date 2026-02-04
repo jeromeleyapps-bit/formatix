@@ -1,0 +1,69 @@
+@{
+    ViewData["Title"] = "Facturation";
+    var devis = ViewBag.Devis as List<FormationManager.Models.Devis> ?? new List<FormationManager.Models.Devis>();
+    var factures = ViewBag.Factures as List<FormationManager.Models.Facture> ?? new List<FormationManager.Models.Facture>();
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4>Facturation</h4>
+    <div>
+        <a asp-action="CreateDevis" class="btn btn-outline-primary"><i class="fas fa-file-invoice"></i> Nouveau devis</a>
+        <a asp-action="CreateFacture" class="btn btn-primary"><i class="fas fa-file-invoice-dollar"></i> Nouvelle facture</a>
+    </div>
+</div>
+
+@if (TempData["Success"] != null)
+{ <div class="alert alert-success alert-dismissible fade show"><span>@TempData["Success"]</span><button type="button" class="btn-close" data-bs-dismiss="alert"></button></div> }
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Devis</div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead><tr><th>Numéro</th><th>Client</th><th>Montant HT</th><th>Statut</th><th></th></tr></thead>
+                        <tbody>
+                            @foreach (var d in devis)
+                            {
+                                <tr>
+                                    <td>@d.Numero</td>
+                                    <td>@(d.Client?.Nom ?? "–")</td>
+                                    <td>@d.MontantHT.ToString("N2") €</td>
+                                    <td>@d.Statut</td>
+                                    <td><a asp-action="DevisPdf" asp-route-id="@d.Id" class="btn btn-sm btn-outline-secondary"><i class="fas fa-file-pdf"></i></a></td>
+                                </tr>
+                            }
+                            @if (!devis.Any()) { <tr><td colspan="5" class="text-muted">Aucun devis.</td></tr> }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">Factures</div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead><tr><th>Numéro</th><th>Client</th><th>Montant HT</th><th>Statut</th><th></th></tr></thead>
+                        <tbody>
+                            @foreach (var f in factures)
+                            {
+                                <tr>
+                                    <td>@f.Numero</td>
+                                    <td>@(f.Client?.Nom ?? "–")</td>
+                                    <td>@f.MontantHT.ToString("N2") €</td>
+                                    <td>@f.Statut</td>
+                                    <td><a asp-action="FacturePdf" asp-route-id="@f.Id" class="btn btn-sm btn-outline-secondary"><i class="fas fa-file-pdf"></i></a></td>
+                                </tr>
+                            }
+                            @if (!factures.Any()) { <tr><td colspan="5" class="text-muted">Aucune facture.</td></tr> }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

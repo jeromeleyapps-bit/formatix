@@ -1,0 +1,54 @@
+@model FormationManager.Models.LoginViewModel
+@{
+    Layout = "_LoginLayout";
+    ViewData["Title"] = "Connexion";
+}
+
+<div class="row justify-content-center">
+    <div class="col-12">
+        <form asp-action="Login" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+            
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label">
+                    <i class="fas fa-envelope me-2"></i>Adresse email
+                </label>
+                <input asp-for="Email" class="form-control form-control-lg" placeholder="email@exemple.com" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label">
+                    <i class="fas fa-lock me-2"></i>Mot de passe
+                </label>
+                <input asp-for="Password" type="password" class="form-control form-control-lg" placeholder="••••••••" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            
+            <div class="mb-4">
+                <div class="form-check">
+                    <input asp-for="RememberMe" class="form-check-input" />
+                    <label asp-for="RememberMe" class="form-check-label">
+                        Se souvenir de moi
+                    </label>
+                </div>
+            </div>
+            
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-sign-in-alt me-2"></i>Se connecter
+                </button>
+            </div>
+            
+            <div class="text-center mt-3">
+                <a href="#" class="text-muted">
+                    <i class="fas fa-question-circle me-1"></i>Mot de passe oublié ?
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

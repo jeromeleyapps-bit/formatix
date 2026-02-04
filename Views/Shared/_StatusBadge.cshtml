@@ -1,0 +1,27 @@
+@* Composant réutilisable pour afficher un badge de statut *@
+@model string
+
+@{
+    var status = Model?.ToLower() ?? "";
+    var badgeClass = status switch
+    {
+        "success" or "actif" or "validé" or "terminé" => "bg-success",
+        "warning" or "en cours" or "en attente" => "bg-warning text-dark",
+        "danger" or "erreur" or "annulé" => "bg-danger",
+        "info" or "information" => "bg-info",
+        _ => "bg-secondary"
+    };
+    
+    var icon = status switch
+    {
+        "success" or "actif" or "validé" or "terminé" => "check-circle",
+        "warning" or "en cours" or "en attente" => "clock",
+        "danger" or "erreur" or "annulé" => "exclamation-triangle",
+        "info" or "information" => "info-circle",
+        _ => "circle"
+    };
+}
+
+<span class="badge @badgeClass">
+    <i class="fas fa-@icon me-1"></i>@Model
+</span>

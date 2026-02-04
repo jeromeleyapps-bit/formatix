@@ -1,0 +1,244 @@
+@model FormationManager.Models.QualiopiIndexViewModel
+@{
+    ViewData["Title"] = "Qualiopi";
+    var grouped = Model.Indicateurs
+        .GroupBy(i => i.Critere)
+        .ToList();
+}
+
+@functions {
+    private string GetLevelClass(FormationManager.Models.IndicateurQualiopi.NiveauPreuve level)
+    {
+        return level switch
+        {
+            FormationManager.Models.IndicateurQualiopi.NiveauPreuve.Eleve => "bg-success",
+            FormationManager.Models.IndicateurQualiopi.NiveauPreuve.Moyen => "bg-warning text-dark",
+            FormationManager.Models.IndicateurQualiopi.NiveauPreuve.Faible => "bg-danger",
+            _ => "bg-secondary"
+        };
+    }
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2>Qualiopi</h2>
+        <div class="text-muted">
+            @Model.TotalIndicateurs indicateurs | @grouped.Count critère(s)
+        </div>
+    </div>
+    <div class="d-flex gap-2">
+        <a asp-action="Preuves" class="btn btn-outline-primary">
+            <i class="fas fa-folder-open"></i> Preuves
+        </a>
+        <a asp-action="CreatePreuve" class="btn btn-primary">
+            <i class="fas fa-plus"></i> Ajouter une preuve
+        </a>
+        <a asp-action="Guide" class="btn btn-info">
+            <i class="fas fa-question-circle"></i> Guide Qualiopi
+        </a>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <div class="fw-semibold">Niveau de validité Qualiopi</div>
+                <div class="text-muted">
+                    @Model.IndicateursValidesCount / @Model.TotalIndicateurs indicateurs validés
+                </div>
+            </div>
+            <div class="h3 mb-0">@Model.TauxValidite%</div>
+        </div>
+        <div class="progress mt-3" style="height: 10px;">
+            <div class="progress-bar bg-success" style="width: @Model.TauxValidite%"></div>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header py-2">
+        <h6 class="m-0 font-weight-bold text-primary mb-0">Radar de conformité par critère</h6>
+    </div>
+    <div class="card-body py-3">
+        <div style="max-width: 400px; margin: 0 auto;">
+            <canvas id="qualiopiRadar" style="max-height: 250px;"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    @foreach (var critere in Model.Criteres)
+    {
+        var barClass = critere.TauxValidite >= 80 ? "bg-success" : critere.TauxValidite >= 50 ? "bg-warning text-dark" : "bg-danger";
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="fw-semibold">Critère @critere.Critere</div>
+                        <div>@critere.TauxValidite%</div>
+                    </div>
+                    <div class="text-muted small">
+                        @critere.IndicateursValides / @critere.TotalIndicateurs indicateurs validés
+                    </div>
+                    <div class="progress mt-2" style="height: 8px;">
+                        <div class="progress-bar @barClass" style="width: @critere.TauxValidite%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="accordion" id="qualiopiAccordion">
+    @if (!grouped.Any())
+    {
+        <div class="alert alert-info">
+            Aucun indicateur Qualiopi disponible.
+        </div>
+    }
+    @foreach (var critereGroup in grouped)
+    {
+        var headingId = $"heading-{critereGroup.Key}";
+        var collapseId = $"collapse-{critereGroup.Key}";
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="@headingId">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#@collapseId">
+                    <span class="me-2 badge bg-primary">Critère @critereGroup.Key</span>
+                    <span>@critereGroup.Count() indicateur(s)</span>
+                </button>
+            </h2>
+            <div id="@collapseId" class="accordion-collapse collapse" data-bs-parent="#qualiopiAccordion">
+                <div class="accordion-body">
+                    <div class="row g-3">
+                        @foreach (var indicateur in critereGroup)
+                        {
+                            var estValide = Model.IndicateursValides.Contains(indicateur.CodeIndicateur);
+                            <div class="col-12 col-lg-6">
+                                <div class="card h-100 border">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start">
+                                            <div>
+                                                <div class="fw-semibold">@indicateur.CodeIndicateur</div>
+                                                <div class="text-muted">@indicateur.Libelle</div>
+                                            </div>
+                                            <span class="badge @GetLevelClass(indicateur.NiveauPreuveRequis)">
+                                                @indicateur.NiveauPreuveRequis
+                                            </span>
+                                        </div>
+                                        <div class="mt-2">
+                                            <span class="badge @(estValide ? "bg-success" : "bg-secondary")">
+                                                @(estValide ? "Validé" : "Non validé")
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var ctx = document.getElementById("qualiopiRadar");
+    if (!ctx) {
+        console.error("Canvas qualiopiRadar not found");
+        return;
+    }
+    
+    @if (Model.Criteres != null && Model.Criteres.Any())
+    {
+        <text>
+        var labels = [@Html.Raw(string.Join(", ", Model.Criteres.Select(c => $"\"Critère {c.Critere}\"")))];
+        var data = [@Html.Raw(string.Join(", ", Model.Criteres.Select(c => c.TauxValidite.ToString(System.Globalization.CultureInfo.InvariantCulture))))];
+        
+        if (typeof Chart === 'undefined') {
+            console.error("Chart.js not loaded");
+            ctx.parentElement.innerHTML = '<div class="alert alert-warning">Chart.js n\'est pas chargé. Veuillez recharger la page.</div>';
+            return;
+        }
+        
+        try {
+            new Chart(ctx, {
+                type: "radar",
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: "Taux de validité (%)",
+                        data: data,
+                        fill: true,
+                        backgroundColor: "rgba(13, 110, 253, 0.2)",
+                        borderColor: "rgba(13, 110, 253, 1)",
+                        pointBackgroundColor: "rgba(13, 110, 253, 1)",
+                        pointBorderColor: "#fff",
+                        pointHoverBackgroundColor: "#fff",
+                        pointHoverBorderColor: "rgba(13, 110, 253, 1)",
+                        pointRadius: 3,
+                        pointHoverRadius: 5,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    aspectRatio: 1.2,
+                    layout: {
+                        padding: {
+                            top: 5,
+                            bottom: 5,
+                            left: 5,
+                            right: 5
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12,
+                                padding: 8,
+                                font: { size: 10 }
+                            }
+                        }
+                    },
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 100,
+                            ticks: { 
+                                stepSize: 20,
+                                font: { size: 9 },
+                                padding: 3
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)',
+                                lineWidth: 1
+                            },
+                            pointLabels: {
+                                font: { size: 10 },
+                                padding: 8
+                            }
+                        }
+                    }
+                }
+            });
+            console.log("Radar chart initialized with", data.length, "criteria");
+        } catch (error) {
+            console.error("Error initializing chart:", error);
+            ctx.parentElement.innerHTML = '<div class="alert alert-danger">Erreur lors de l\'initialisation du graphique: ' + error.message + '</div>';
+        }
+        </text>
+    }
+    else
+    {
+        <text>
+        ctx.parentElement.innerHTML = '<div class="alert alert-info">Aucune donnée disponible pour le graphique radar.</div>';
+        </text>
+    }
+});
+</script>

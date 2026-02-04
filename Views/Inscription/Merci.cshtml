@@ -1,0 +1,21 @@
+@{
+    ViewData["Title"] = "Inscription enregistrée";
+    Layout = "_LoginLayout";
+    var titre = ViewBag.Titre as string;
+    var lieu = ViewBag.Lieu as string;
+    var dateDebut = ViewBag.DateDebut as string;
+    var dateFin = ViewBag.DateFin as string;
+}
+
+<div class="text-center">
+    <p class="fs-5 text-success mb-4">Merci, votre inscription a bien été enregistrée.</p>
+    @if (!string.IsNullOrEmpty(titre) || !string.IsNullOrEmpty(lieu))
+    {
+        <div class="text-muted mb-4">
+            @if (!string.IsNullOrEmpty(titre)) { <p class="mb-1"><strong>@titre</strong></p> }
+            @if (!string.IsNullOrEmpty(lieu)) { <p class="mb-1">Lieu : @lieu</p> }
+            @if (!string.IsNullOrEmpty(dateDebut) && !string.IsNullOrEmpty(dateFin)) { <p class="mb-0">Dates : @dateDebut - @dateFin</p> }
+        </div>
+    }
+    <a href="/" class="btn btn-outline-secondary">Retour à l'accueil</a>
+</div>

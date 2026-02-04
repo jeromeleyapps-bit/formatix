@@ -1,0 +1,35 @@
+@model FormationManager.Models.Formateur
+@{
+    ViewData["Title"] = "Supprimer le formateur";
+}
+
+<div class="card">
+    <div class="card-header">
+        <h5>Supprimer le formateur</h5>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-warning">
+            <i class="fas fa-exclamation-triangle"></i> Êtes-vous sûr de vouloir supprimer ce formateur ?
+        </div>
+
+        <dl class="row">
+            <dt class="col-sm-3">Nom:</dt>
+            <dd class="col-sm-9">@Model.Prenom @Model.Nom</dd>
+
+            <dt class="col-sm-3">Email:</dt>
+            <dd class="col-sm-9">@Model.Email</dd>
+
+            <dt class="col-sm-3">Statut professionnel:</dt>
+            <dd class="col-sm-9">@Model.StatutProfessionnel</dd>
+        </dl>
+
+        <form asp-action="Delete" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-danger">Supprimer</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Annuler</a>
+            </div>
+        </form>
+    </div>
+</div>

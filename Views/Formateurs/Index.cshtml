@@ -1,0 +1,105 @@
+@model List<FormationManager.Models.Formateur>
+@{
+    ViewData["Title"] = "Pool de formateurs";
+    var siteNames = ViewBag.SiteNames as Dictionary<string, string> ?? new Dictionary<string, string>();
+    var showSite = ViewBag.ShowSite as bool? ?? false;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4>Pool de formateurs</h4>
+    <a asp-action="Create" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Ajouter un formateur
+    </a>
+</div>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Email</th>
+                        <th>Téléphone</th>
+                        <th>Statut professionnel</th>
+                        <th>Numéro formateur</th>
+                        <th>Antenne</th>
+                        @if (showSite)
+                        {
+                            <th>Site</th>
+                        }
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        @foreach (var formateur in Model)
+                        {
+                            <tr>
+                                <td>@formateur.Prenom @formateur.Nom</td>
+                                <td>@formateur.Email</td>
+                                <td>@formateur.Telephone</td>
+                                <td>@formateur.StatutProfessionnel</td>
+                                <td>@formateur.NumeroFormateur</td>
+                                <td>@formateur.AntenneRattachement</td>
+                                @if (showSite)
+                                {
+                                    <td>@(siteNames.ContainsKey(formateur.SiteId ?? "") ? siteNames[formateur.SiteId ?? ""] : formateur.SiteId)</td>
+                                }
+                                <td>
+                                    @if (formateur.Actif)
+                                    {
+                                        <span class="badge bg-success">Actif</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Inactif</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a asp-action="Details" asp-route-id="@formateur.Id" class="btn btn-outline-info">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a asp-action="Edit" asp-route-id="@formateur.Id" class="btn btn-outline-primary">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@formateur.Id" class="btn btn-outline-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="@(showSite ? 9 : 8)" class="text-center text-muted">
+                                Aucun formateur enregistré. <a asp-action="Create">Créer le premier formateur</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

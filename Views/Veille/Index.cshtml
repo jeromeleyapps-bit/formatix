@@ -1,0 +1,198 @@
+@model FormationManager.Models.VeilleIndexViewModel
+@{
+    ViewData["Title"] = "Veille critère 6";
+    var indicateurs = ViewBag.Indicateurs as IEnumerable<dynamic> ?? Enumerable.Empty<dynamic>();
+}
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-1"></i> @TempData["Success"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-1"></i> @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+    </div>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+    <div>
+        <h2><i class="fas fa-rss text-primary me-2"></i> Veille critère 6</h2>
+        <p class="text-muted mb-0">
+            Actualités et validations de lecture pour les indicateurs 23 à 29 (veille réglementaire, métiers, pédagogie, handicap, insertion…).
+        </p>
+    </div>
+    <div>
+        <form asp-controller="Veille" asp-action="Actualiser" method="post" class="d-inline">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-sync-alt me-1"></i> Actualiser les flux
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+        <h6 class="m-0 fw-bold"><i class="fas fa-newspaper me-2"></i> Actualités</h6>
+        <span class="badge bg-secondary">@Model.Items.Count actualités</span>
+    </div>
+    <div class="card-body">
+        @if (Model.Items.Count == 0)
+        {
+            <p class="text-muted mb-0">Aucune actualité. Cliquez sur <strong>Actualiser les flux</strong> pour récupérer les dernières actualités.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Titre</th>
+                            <th>Flux</th>
+                            <th>Suggest. I</th>
+                            <th>Statut</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var i in Model.Items)
+                        {
+                            <tr>
+                                <td class="text-nowrap">@(i.PublishedUtc?.ToString("dd/MM/yyyy") ?? "–")</td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(i.Link))
+                                    {
+                                        <a href="@i.Link" target="_blank" rel="noopener">@i.Title</a>
+                                    }
+                                    else
+                                    {
+                                        @i.Title
+                                    }
+                                </td>
+                                <td>@i.FeedName</td>
+                                <td>@(i.SuggestedIndicateurCode != null ? "I" + i.SuggestedIndicateurCode : "–")</td>
+                                <td>
+                                    @if (i.IsValidated)
+                                    {
+                                        <span class="badge bg-success">Validée</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-light text-dark">Non validée</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (!i.IsValidated)
+                                    {
+                                        <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#validerModal"
+                                                data-item-id="@i.Id" data-item-title="@i.Title" data-suggested-id="@(i.SuggestedIndicateurId ?? 0)">
+                                            <i class="fas fa-check me-1"></i> Valider
+                                        </button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+        <h6 class="m-0 fw-bold"><i class="fas fa-check-double me-2"></i> Validations</h6>
+        <span class="badge bg-secondary">@Model.Validations.Count</span>
+    </div>
+    <div class="card-body">
+        @if (Model.Validations.Count == 0)
+        {
+            <p class="text-muted mb-0">Aucune validation pour l’instant. Validez une actualité pour l’associer à un indicateur (I23–I29).</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead class="table-light">
+                        <tr><th>Date</th><th>Actualité</th><th>Indicateur</th><th>Par</th></tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var v in Model.Validations)
+                        {
+                            <tr>
+                                <td class="text-nowrap">@v.ValidatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(v.ItemLink))
+                                    {
+                                        <a href="@v.ItemLink" target="_blank" rel="noopener">@v.ItemTitle</a>
+                                    }
+                                    else
+                                    {
+                                        @v.ItemTitle
+                                    }
+                                </td>
+                                <td>I@v.IndicateurCode – @v.IndicateurLibelle</td>
+                                <td>@v.ValidatedBy</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Modal Valider -->
+<div class="modal fade" id="validerModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form asp-action="Valider" method="post" id="validerForm">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="rssItemId" id="validerItemId" />
+                <div class="modal-header">
+                    <h5 class="modal-title">Valider cette actualité</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted small mb-2" id="validerItemTitle"></p>
+                    <label class="form-label">Indicateur Qualiopi (critère 6)</label>
+                    <select name="indicateurId" id="validerIndicateurId" class="form-select" required>
+                        <option value="">— Choisir —</option>
+                        @foreach (var ind in indicateurs)
+                        {
+                            <option value="@ind.Id">I@ind.CodeIndicateur – @ind.Libelle</option>
+                        }
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-check me-1"></i> Enregistrer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+(function () {
+    var m = document.getElementById('validerModal');
+    if (!m) return;
+    m.addEventListener('show.bs.modal', function (e) {
+        var btn = e.relatedTarget;
+        var id = btn.getAttribute('data-item-id');
+        var title = btn.getAttribute('data-item-title');
+        var suggested = parseInt(btn.getAttribute('data-suggested-id'), 10) || 0;
+        document.getElementById('validerItemId').value = id;
+        document.getElementById('validerItemTitle').textContent = title || '';
+        var sel = document.getElementById('validerIndicateurId');
+        sel.value = suggested > 0 ? '' + suggested : '';
+    });
+})();
+</script>
+}

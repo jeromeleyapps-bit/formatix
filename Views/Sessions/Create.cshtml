@@ -1,0 +1,174 @@
+@model FormationManager.Models.Session
+@{
+    ViewData["Title"] = "Nouvelle session";
+}
+
+<div class="card">
+    <div class="card-body">
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger">
+                <h6><i class="fas fa-exclamation-triangle"></i> Erreurs de validation :</h6>
+                <ul class="mb-0">
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <li>@error.ErrorMessage</li>
+                    }
+                </ul>
+            </div>
+        }
+
+        <form asp-action="Create" method="post">
+            @if (ViewBag.Sites != null)
+            {
+                <div class="mb-3">
+                    <label asp-for="SiteId" class="form-label">Site</label>
+                    <select asp-for="SiteId" class="form-select">
+                        <option value="">-- Sélectionner un site --</option>
+                        @foreach (var site in (List<FormationManager.Services.SiteInfo>)ViewBag.Sites)
+                        {
+                            <option value="@site.SiteId">@site.Name</option>
+                        }
+                    </select>
+                </div>
+            }
+            <div class="mb-3">
+                <label asp-for="FormationId" class="form-label">Formation *</label>
+                <select name="FormationId" id="formationSelect" class="form-select" required>
+                    <option value="">-- Sélectionner une formation --</option>
+                    @if (ViewBag.Formations != null)
+                    {
+                        var formations = ViewBag.Formations as List<FormationManager.Models.Formation> ?? new List<FormationManager.Models.Formation>();
+                        @foreach (var formation in formations)
+                        {
+                            <option value="@formation.Id" selected="@(Model != null && Model.FormationId == formation.Id)">@formation.Titre</option>
+                        }
+                    }
+                </select>
+                <span asp-validation-for="FormationId" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="FormateurId" class="form-label">Formateur *</label>
+                @{
+                    var formateurs = ViewBag.Formateurs as List<FormationManager.Models.Formateur>;
+                }
+                @if (formateurs != null && formateurs.Count > 0)
+                {
+                    <select name="FormateurId" id="formateurSelect" class="form-select" required>
+                        <option value="">-- Sélectionner un formateur --</option>
+                        @foreach (var formateur in formateurs)
+                        {
+                            var displayName = $"{formateur.Prenom} {formateur.Nom}";
+                            if (!string.IsNullOrWhiteSpace(formateur.Email))
+                            {
+                                displayName += $" ({formateur.Email})";
+                            }
+                            if (!string.IsNullOrWhiteSpace(formateur.NumeroFormateur))
+                            {
+                                displayName += $" - N°{formateur.NumeroFormateur}";
+                            }
+                            <option value="@formateur.Id" selected="@(Model != null && Model.FormateurId == formateur.Id)">@displayName</option>
+                        }
+                    </select>
+                    <span asp-validation-for="FormateurId" class="text-danger"></span>
+                    <small class="text-muted d-block mt-1">Sélectionnez d'abord une formation pour voir le formateur habituel</small>
+                }
+                else
+                {
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i> Aucun formateur disponible. 
+                        <a href="/Formateurs/Create" class="alert-link">Créer un formateur</a> dans le pool de formateurs.
+                    </div>
+                    <input type="hidden" name="FormateurId" value="0" />
+                }
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="DateDebut" class="form-label"></label>
+                    <input asp-for="DateDebut" type="date" class="form-control" />
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="DateFin" class="form-label"></label>
+                    <input asp-for="DateFin" type="date" class="form-control" />
+                </div>
+            </div>
+            @if (ViewBag.Salles != null && (ViewBag.Salles as IEnumerable<FormationManager.Models.Salle>)?.Any() == true)
+            {
+                <div class="mb-3">
+                    <label class="form-label">Salle</label>
+                    <select name="SalleId" class="form-select">
+                        <option value="">-- Aucune --</option>
+                        @foreach (var s in (IEnumerable<FormationManager.Models.Salle>)ViewBag.Salles)
+                        {
+                            <option value="@s.Id">@s.Nom@(s.Capacite.HasValue ? $" ({s.Capacite} pl.)" : "")</option>
+                        }
+                    </select>
+                </div>
+            }
+            <div class="mb-3">
+                <label asp-for="Lieu" class="form-label">Lieu @(ViewBag.Salles != null && (ViewBag.Salles as IEnumerable<FormationManager.Models.Salle>)?.Any() == true ? "(ou complément)" : "")</label>
+                <input asp-for="Lieu" class="form-control" />
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label asp-for="Statut" class="form-label">Statut</label>
+                    <select asp-for="Statut" class="form-select">
+                        <option value="Programmée" selected>Programmée</option>
+                        <option value="En cours">En cours</option>
+                        <option value="Terminée">Terminée</option>
+                        <option value="Annulée">Annulée</option>
+                    </select>
+                    <small class="text-muted">Statut de la session de formation</small>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label asp-for="NombreMaxStagiaires" class="form-label">Nombre maximum de stagiaires</label>
+                    <input asp-for="NombreMaxStagiaires" type="number" class="form-control" value="20" min="1" />
+                </div>
+            </div>
+            <div class="form-check mb-3">
+                <input asp-for="EstPublique" class="form-check-input" />
+                <label asp-for="EstPublique" class="form-check-label"></label>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Créer</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Annuler</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@{
+    var formationFormateurs = ViewBag.FormationFormateurs as Dictionary<int, int> ?? new Dictionary<int, int>();
+}
+@if (formationFormateurs.Any())
+{
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const formationSelect = document.getElementById('formationSelect');
+        const formateurSelect = document.getElementById('formateurSelect');
+        
+        if (formationSelect && formateurSelect) {
+            try {
+                // Stocker les formateurs par formation
+                const formateursParFormation = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(formationFormateurs));
+                
+                formationSelect.addEventListener('change', function() {
+                    const formationId = parseInt(this.value);
+                    if (formationId && formateursParFormation && formateursParFormation[formationId]) {
+                        const formateurId = formateursParFormation[formationId];
+                        formateurSelect.value = formateurId;
+                    } else {
+                        formateurSelect.value = '';
+                    }
+                });
+            } catch (e) {
+                console.error('Erreur lors de l\'initialisation du script:', e);
+            }
+        }
+    });
+    </script>
+}
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

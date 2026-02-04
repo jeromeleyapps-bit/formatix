@@ -1,0 +1,43 @@
+@model FormationManager.Models.Salle
+@{
+    ViewData["Title"] = "Modifier la salle";
+}
+
+<div class="card">
+    <div class="card-body">
+        <form asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" />
+            @if (ViewBag.Sites != null)
+            {
+                <div class="mb-3">
+                    <label asp-for="SiteId" class="form-label">Site</label>
+                    <select asp-for="SiteId" class="form-select" asp-items="@(ViewBag.Sites as SelectList)">
+                        <option value="">-- Sélectionner --</option>
+                    </select>
+                </div>
+            }
+            <div class="mb-3">
+                <label asp-for="Nom" class="form-label">Nom *</label>
+                <input asp-for="Nom" class="form-control" required />
+                <span asp-validation-for="Nom" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Capacite" class="form-label">Capacité (personnes)</label>
+                <input asp-for="Capacite" type="number" class="form-control" min="1" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Adresse" class="form-label">Adresse</label>
+                <input asp-for="Adresse" class="form-control" />
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Annuler</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+@{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}
