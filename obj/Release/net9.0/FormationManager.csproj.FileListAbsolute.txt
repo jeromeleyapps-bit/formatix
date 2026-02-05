@@ -379,3 +379,9 @@ C:\AI\Opagax\bin\Release\net9.0\System.ServiceModel.Syndication.dll
 C:\AI\Opagax\obj\Release\net9.0\FormationManager.sourcelink.json
 C:\AI\Opagax\obj\Release\net9.0\compressed\g4to9cl4yg-zkymzubbgl.gz
 C:\AI\Opagax\obj\Release\net9.0\compressed\evll57dxxn-hf0hgxq5hy.gz
+C:\AI\Opagax\bin\Release\net9.0\publish-temp\web.config
+C:\AI\Opagax\bin\Release\net9.0\publish-temp\appsettings.json
+C:\AI\Opagax\bin\Release\net9.0\publish-temp\Config\veille-rss-feeds.json
+C:\AI\Opagax\bin\Release\net9.0\publish-temp\FormationManager.deps.json
+C:\AI\Opagax\bin\Release\net9.0\publish-temp\FormationManager.runtimeconfig.json
+C:\AI\Opagax\bin\Release\net9.0\publish-temp\FormationManager.staticwebassets.endpoints.json

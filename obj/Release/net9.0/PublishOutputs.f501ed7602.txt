@@ -1,6 +1,12 @@
 C:\AI\Opagax\publish-temp\FormationManager.exe
+C:\AI\Opagax\publish-temp\publish-temp\web.config
 C:\AI\Opagax\publish-temp\appsettings.json
 C:\AI\Opagax\publish-temp\Config\veille-rss-feeds.json
+C:\AI\Opagax\publish-temp\publish-temp\appsettings.json
+C:\AI\Opagax\publish-temp\publish-temp\Config\veille-rss-feeds.json
+C:\AI\Opagax\publish-temp\publish-temp\FormationManager.deps.json
+C:\AI\Opagax\publish-temp\publish-temp\FormationManager.runtimeconfig.json
+C:\AI\Opagax\publish-temp\publish-temp\FormationManager.staticwebassets.endpoints.json
 C:\AI\Opagax\publish-temp\x86\leptonica-1.82.0.dll
 C:\AI\Opagax\publish-temp\x86\tesseract50.dll
 C:\AI\Opagax\publish-temp\x64\leptonica-1.82.0.dll

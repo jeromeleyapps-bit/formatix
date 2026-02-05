@@ -8,6 +8,10 @@
     var email = ViewBag.Email as string ?? "";
     var telephone = ViewBag.Telephone as string ?? "";
     var poste = ViewBag.Poste as string ?? "";
+    var besoinAdaptation = ViewBag.BesoinAdaptation as string ?? "non";
+    var detailsAdaptation = ViewBag.DetailsAdaptation as string ?? "";
+    var niveauConnaissance = ViewBag.NiveauConnaissance as string ?? "";
+    var attentes = ViewBag.Attentes as string ?? "";
     var erreur = ViewBag.Erreur as string;
 }
 
@@ -48,6 +52,42 @@
         <div class="mb-4">
             <label class="form-label">Poste (optionnel)</label>
             <input type="text" name="poste" class="form-control" value="@poste" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Avez-vous besoin d'adaptations spécifiques liées à un handicap ?</label>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="besoinAdaptation" id="adaptationNon" value="non" @(besoinAdaptation == "oui" ? "" : "checked")>
+                <label class="form-check-label" for="adaptationNon">
+                    Non
+                </label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="radio" name="besoinAdaptation" id="adaptationOui" value="oui" @(besoinAdaptation == "oui" ? "checked" : "")>
+                <label class="form-check-label" for="adaptationOui">
+                    Oui, j'ai besoin d'adaptations
+                </label>
+            </div>
+            <small class="form-text text-muted">
+                Ces informations sont confidentielles et servent uniquement à adapter au mieux les conditions de formation.
+            </small>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Si oui, précisez les adaptations nécessaires (optionnel)</label>
+            <textarea name="detailsAdaptation" class="form-control" rows="3">@detailsAdaptation</textarea>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Sur une échelle de 1 à 10, comment évaluez-vous votre connaissance actuelle du sujet ?</label>
+            <input type="number" name="niveauConnaissance" class="form-control" min="1" max="10" value="@niveauConnaissance" />
+            <small class="form-text text-muted">1 = débutant complet, 10 = très expérimenté.</small>
+        </div>
+
+        <div class="mb-4">
+            <label class="form-label">Quelles sont vos attentes principales pour cette formation ?</label>
+            <textarea name="attentes" class="form-control" rows="3">@attentes</textarea>
+            <small class="form-text text-muted">Par exemple : objectifs professionnels, compétences à développer, projet spécifique...</small>
         </div>
 
         <div class="d-grid">

@@ -63,7 +63,11 @@ namespace FormationManager.Controllers
             string prenom,
             string? email,
             string? telephone,
-            string? poste)
+            string? poste,
+            string? besoinAdaptation,
+            string? detailsAdaptation,
+            string? niveauConnaissance,
+            string? attentes)
         {
             var session = await _context.Sessions
                 .Include(s => s.Formation)
@@ -92,6 +96,10 @@ namespace FormationManager.Controllers
                 ViewBag.Email = email ?? "";
                 ViewBag.Telephone = telephone ?? "";
                 ViewBag.Poste = poste ?? "";
+                ViewBag.BesoinAdaptation = (besoinAdaptation ?? "non").ToLowerInvariant();
+                ViewBag.DetailsAdaptation = detailsAdaptation ?? "";
+                ViewBag.NiveauConnaissance = niveauConnaissance ?? "";
+                ViewBag.Attentes = attentes ?? "";
             }
 
             if (string.IsNullOrWhiteSpace(nom))
@@ -120,6 +128,27 @@ namespace FormationManager.Controllers
                 }
             }
 
+            // Normaliser les champs complémentaires
+            besoinAdaptation = (besoinAdaptation ?? "non").Trim().ToLowerInvariant();
+            detailsAdaptation = (detailsAdaptation ?? string.Empty).Trim();
+            niveauConnaissance = (niveauConnaissance ?? string.Empty).Trim();
+            attentes = (attentes ?? string.Empty).Trim();
+
+            int? niveauConnaissanceInt = null;
+            if (!string.IsNullOrWhiteSpace(niveauConnaissance))
+            {
+                if (int.TryParse(niveauConnaissance, out var parsed) && parsed >= 1 && parsed <= 10)
+                {
+                    niveauConnaissanceInt = parsed;
+                }
+                else
+                {
+                    SetFormBag();
+                    ViewBag.Erreur = "Merci d'indiquer un niveau de connaissance entre 1 et 10.";
+                    return View("Formulaire");
+                }
+            }
+
             var siteId = session.SiteId ?? string.Empty;
             var independant = await _context.Clients
                 .FirstOrDefaultAsync(c =>
@@ -141,6 +170,25 @@ namespace FormationManager.Controllers
                 await _context.SaveChangesAsync();
             }
 
+            // Construire les champs texte pour tracer les besoins et l'auto-évaluation
+            var commentaires = string.Empty;
+            if (niveauConnaissanceInt.HasValue)
+            {
+                commentaires += $"Niveau initial (auto-évaluation) : {niveauConnaissanceInt.Value}/10.\n";
+            }
+            if (besoinAdaptation == "oui")
+            {
+                commentaires += "Besoin d'adaptations liées à un handicap : OUI.\n";
+                if (!string.IsNullOrEmpty(detailsAdaptation))
+                {
+                    commentaires += $"Détails des adaptations souhaitées : {detailsAdaptation}\n";
+                }
+            }
+            if (!string.IsNullOrEmpty(attentes))
+            {
+                commentaires += $"Attentes pour la formation : {attentes}\n";
+            }
+
             var stagiaire = new Stagiaire
             {
                 ClientId = independant.Id,
@@ -155,7 +203,8 @@ namespace FormationManager.Controllers
                 DateCreation = DateTime.Now,
                 DateModification = DateTime.Now,
                 CreePar = "inscription-en-ligne",
-                ModifiePar = "inscription-en-ligne"
+                ModifiePar = "inscription-en-ligne",
+                CommentairesEvaluation = commentaires
             };
 
             _context.Stagiaires.Add(stagiaire);
