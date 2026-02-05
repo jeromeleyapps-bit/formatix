@@ -307,7 +307,9 @@ namespace FormationManager.Services
         public async Task<byte[]> ExportCataloguePDFAsync(string? siteId = null)
         {
             // Récupérer les formations (toutes si aucune n'est publique, sinon seulement publiques)
-            var query = _context.Formations.AsQueryable();
+            var query = _context.Formations
+                .Include(f => f.Sessions)
+                .AsQueryable();
             
             // Filtrer par site si spécifié
             if (!string.IsNullOrEmpty(siteId))
@@ -356,6 +358,38 @@ namespace FormationManager.Services
             
             // Logo de l'organisation (si disponible)
             var logoPath = _organizationService.GetLogoPath();
+            
+            // Préparer les liens / QR d'inscription par formation (sessions programmées ou en cours)
+            var inscriptionsParFormation = new Dictionary<int, List<(string TitreSession, string Url)>>();
+            try
+            {
+                foreach (var formation in formations)
+                {
+                    var sessionsOuvertes = formation.Sessions?
+                        .Where(s => s.Statut == "Programmée" || s.Statut == "En cours")
+                        .OrderBy(s => s.DateDebut)
+                        .ToList() ?? new List<Session>();
+
+                    if (sessionsOuvertes.Any())
+                    {
+                        var liste = new List<(string, string)>();
+                        foreach (var session in sessionsOuvertes)
+                        {
+                            var url = _inscriptionLinkService.GetInscriptionUrl(session.Id);
+                            var titreSession = session.DateDebut != default
+                                ? $"{session.DateDebut:dd/MM/yyyy} - {session.Lieu}"
+                                : session.Lieu ?? $"Session #{session.Id}";
+                            liste.Add((titreSession, url));
+                        }
+
+                        inscriptionsParFormation[formation.Id] = liste;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Impossible de préparer les liens d'inscription pour le catalogue");
+            }
             
             // Générer le PDF avec QuestPDF
             var document = PdfDocument.Create(container =>
@@ -853,6 +887,73 @@ namespace FormationManager.Services
                                                 .FontColor(Colors.Yellow.Darken3)
                                                 .AlignRight();
                                         });
+
+                                    // Bloc Inscription en ligne : liens + QR code si des sessions ouvertes existent
+                                    if (inscriptionsParFormation.TryGetValue(formation.Id, out var inscriptions) && inscriptions.Any())
+                                    {
+                                        formationColumn.Item()
+                                            .PaddingTop(20)
+                                            .Column(inscriptionColumn =>
+                                            {
+                                                inscriptionColumn.Item()
+                                                    .PaddingBottom(5)
+                                                    .BorderBottom(2f, Unit.Point)
+                                                    .BorderColor(Colors.Blue.Medium)
+                                                    .Text("Inscription en ligne")
+                                                    .FontSize(13)
+                                                    .Bold()
+                                                    .FontColor(Colors.Blue.Medium);
+
+                                                foreach (var (titreSession, url) in inscriptions)
+                                                {
+                                                    inscriptionColumn.Item()
+                                                        .PaddingVertical(4)
+                                                        .Row(row =>
+                                                        {
+                                                            row.RelativeItem()
+                                                                .Column(col =>
+                                                                {
+                                                                    col.Item()
+                                                                        .Text(titreSession)
+                                                                        .FontSize(10)
+                                                                        .Bold();
+                                                                    col.Item()
+                                                                        .Text(url)
+                                                                        .FontSize(9)
+                                                                        .FontColor(Colors.Blue.Darken2);
+                                                                });
+
+                                                            row.ConstantItem(70)
+                                                                .PaddingLeft(5)
+                                                                .AlignCenter()
+                                                                .AlignMiddle()
+                                                                .Element(container =>
+                                                                {
+                                                                    try
+                                                                    {
+                                                                        var qrBytes = GenerateQrCodeBytes(url);
+                                                                        container
+                                                                            .Padding(1)
+                                                                            .Border(1)
+                                                                            .BorderColor(Colors.Grey.Lighten2)
+                                                                            .Image(qrBytes)
+                                                                            .FitArea();
+                                                                    }
+                                                                    catch
+                                                                    {
+                                                                        // En cas d'erreur de génération QR, on ignore simplement
+                                                                    }
+                                                                });
+                                                        });
+                                                }
+
+                                                inscriptionColumn.Item()
+                                                    .PaddingTop(5)
+                                                    .Text("Scannez le QR code ou saisissez le lien dans votre navigateur pour vous inscrire en ligne.")
+                                                    .FontSize(8)
+                                                    .FontColor(Colors.Grey.Darken1);
+                                            });
+                                    }
                                 });
                             }
                             
