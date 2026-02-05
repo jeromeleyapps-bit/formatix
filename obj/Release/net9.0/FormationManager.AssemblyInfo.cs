@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FormationManager")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9012ed9dfd2c686ec9055c0e5c704bc8ddbceb6f")]
 [assembly: System.Reflection.AssemblyProductAttribute("FormationManager")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FormationManager")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

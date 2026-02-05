@@ -376,3 +376,6 @@ C:\AI\Opagax\obj\Release\net9.0\ref\FormationManager.dll
 C:\AI\Opagax\bin\Release\net9.0\Config\veille-rss-feeds.json
 C:\AI\Opagax\bin\Release\net9.0\QRCoder.dll
 C:\AI\Opagax\bin\Release\net9.0\System.ServiceModel.Syndication.dll
+C:\AI\Opagax\obj\Release\net9.0\FormationManager.sourcelink.json
+C:\AI\Opagax\obj\Release\net9.0\compressed\g4to9cl4yg-zkymzubbgl.gz
+C:\AI\Opagax\obj\Release\net9.0\compressed\evll57dxxn-hf0hgxq5hy.gz

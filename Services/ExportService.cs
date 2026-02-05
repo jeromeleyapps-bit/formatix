@@ -9,6 +9,7 @@ using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using PdfDocument = QuestPDF.Fluent.Document;
+using QRCoder;
 
 namespace FormationManager.Services
 {
@@ -27,20 +28,34 @@ namespace FormationManager.Services
         private readonly ILogger<ExportService> _logger;
         private readonly IOrganizationService _organizationService;
         private readonly IConfiguration _configuration;
+        private readonly IInscriptionLinkService _inscriptionLinkService;
 
         public ExportService(
             FormationDbContext context, 
             ILogger<ExportService> logger,
             IOrganizationService organizationService,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IInscriptionLinkService inscriptionLinkService)
         {
             _context = context;
             _logger = logger;
             _organizationService = organizationService;
             _configuration = configuration;
+            _inscriptionLinkService = inscriptionLinkService;
             
             // Configuration QuestPDF
             QuestPDF.Settings.License = LicenseType.Community;
+        }
+
+        /// <summary>
+        /// Génère un QR code PNG (bytes) à partir d'une URL.
+        /// </summary>
+        private static byte[] GenerateQrCodeBytes(string url)
+        {
+            using var qr = new QRCodeGenerator();
+            using var data = qr.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);
+            using var png = new PngByteQRCode(data);
+            return png.GetGraphic(20);
         }
 
         public async Task<byte[]> ExportSessionsCSVAsync(DateTime debut, DateTime fin)
