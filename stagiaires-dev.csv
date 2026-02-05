@@ -1,0 +1,14 @@
+Id,Nom,Prenom,Email,Telephone,Poste,SessionId,ClientId,SiteId,StatutInscription,HeuresPresence,EstPresent
+2,KERLEAU,Marine,m.kerleau@debrouillonet.org,0612121212,"Coordinatrice d'activités",1,2,AVI,Inscrit,0.0,1
+3,BOTTREAU,Karine,k.bottreau@debrouillonet.org,0611111111,"Coordinatrice départementale",1,2,AVI,Inscrit,0.0,1
+4,Valjean,Jean,lauriecentelles@gmail.com,0672252017,insertion,,1,AVI,Inscrit,0.0,1
+5,kaaouachi,chaimae,chaimae.kaaouachi@gmail.com,0769066209,stagiaire,1,1,AVI,Inscrit,0.0,1
+6,houdelier,claire,houdelierclaire@gmail.com,0764176788,"service civique",1,1,AVI,Inscrit,0.0,1
+7,Pisapia,Emma,pisapiaemma1@gmail.com,0675719675,"Service civique",1,1,AVI,Inscrit,0.0,1
+8,Tichit,"Anaïs",a.tichit@debrouillonet.org,0781947398,"service civique",1,1,AVI,Inscrit,0.0,1
+9,"Clément",Soryana,soryanaclement@gmail.com,0601455291,"",1,1,AVI,Inscrit,0.0,1
+10,GETTIAUX,ALEXANDRE,a.gettiaux@debrouillonet.org,0781461115,chef,1,1,AVI,Inscrit,0.0,1
+11,kaaouachi,loubna,loubna.kaaouachi13@gmail.com,0768049380,stagiaire,1,1,AVI,Inscrit,0.0,1
+12,ISSA,Faisa,issa.faisa@icloud.com,0758752038,"Service civique",1,1,AVI,Inscrit,0.0,1
+13,azzimani,abdelhamid,azzimani@outlook.coml,0768653352,"",1,1,AVI,Inscrit,0.0,1
+14,Mougin,flora,flora.mougin@gmail.com,0641409058,vacataire,1,1,AVI,Inscrit,0.0,1

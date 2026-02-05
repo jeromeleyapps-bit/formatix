@@ -494,8 +494,14 @@ namespace FormationManager.Controllers
             ViewBag.ShowSite = _siteContext.IsAdmin;
             ViewBag.SiteNames = _siteContext.GetSites().ToDictionary(s => s.SiteId, s => s.Name);
 
-            var inscriptionsOuvertes = session.EstPublique && (session.Statut == "Programmée" || session.Statut == "En cours");
-            ViewBag.InscriptionUrl = inscriptionsOuvertes ? _inscriptionLinkService.GetInscriptionUrl(session.Id) : null;
+            // Lien d'inscription en ligne :
+            // - On veut pouvoir partager un lien même si la session n'est pas marquée "publique"
+            // - Le contrôle d'ouverture/fermeture des inscriptions se fait côté InscriptionController
+            //   en fonction du statut et du nombre de places.
+            var inscriptionsOuvertes = session.Statut == "Programmée" || session.Statut == "En cours";
+            ViewBag.InscriptionUrl = inscriptionsOuvertes
+                ? _inscriptionLinkService.GetInscriptionUrl(session.Id)
+                : null;
 
             return View(session);
         }

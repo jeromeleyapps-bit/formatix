@@ -30,6 +30,7 @@
                     <th>Email</th>
                     <th>Téléphone</th>
                     <th>Documents</th>
+                    <th>Actions</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -96,6 +97,17 @@
                                         </div>
                                     }
                                 }
+                            </div>
+                        </td>
+                        <td rowspan="@nombreSessions">
+                            <div class="d-flex flex-column gap-1">
+                                <a asp-action="Delete"
+                                   asp-route-id="@stagiaire.Id"
+                                   asp-route-returnUrl="@Url.Action("Index", "Stagiaires")"
+                                   class="btn btn-outline-danger btn-sm"
+                                   title="Supprimer ce stagiaire">
+                                    <i class="fas fa-trash"></i> Supprimer
+                                </a>
                             </div>
                         </td>
                     </tr>

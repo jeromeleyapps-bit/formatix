@@ -200,9 +200,9 @@ namespace FormationManager.Controllers
 
         private async Task<(bool Ok, string Message)> CanAcceptInscriptionAsync(Models.Session session)
         {
-            if (!session.EstPublique)
-                return (false, "Les inscriptions en ligne ne sont pas ouvertes pour cette session.");
-
+            // Ne plus bloquer sur EstPublique : on veut pouvoir utiliser un lien direct
+            // même pour des sessions "privées". Le paramètre EstPublique est plutôt
+            // utilisé pour l'affichage dans les catalogues / listes.
             if (!StatutsOuverts.Contains(session.Statut ?? ""))
                 return (false, "Cette session n'accepte plus d'inscriptions (statut : " + (session.Statut ?? "—") + ").");
 
